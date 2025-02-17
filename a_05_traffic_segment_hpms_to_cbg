@@ -1,0 +1,94 @@
+#a_05_traffic_segment_hpms_to_cbg.R
+
+# Load required packages
+install.packages("gstat")  # Required for kriging interpolation
+install.packages("sp")     # Required for spatial data conversion
+library(sf)
+library(gstat)
+library(sp)
+
+# set coordinate reference system
+crs <- 2163
+
+# Load Connecticut traffic data (previously saved)
+aadt_ct_2022 <- readRDS("generated_data/aadt_ct_2022.rds") 
+aadt_segments <- aadt_ct_2022 
+
+# Load grids
+sld_us_loc <- readRDS("generated_data/smart_location_data_subset.rds") 
+
+grid <- sf::st_centroid(sld_us_loc[, c("GEOID20")]) %>%
+  sf::st_transform(crs)
+
+# Load spatial context (New Haven boundaries)
+# Load New Haven Neighborhood shapefile
+neighborhood <- sf::st_read("NewHaven_NeighbhorhoodBoundaries.shp") %>%
+  sf::st_transform(crs)
+
+# Load required libraries
+library(tmap)
+
+#EXTRA ----- TO VIEW THE SHAPEFILE
+# Read the shapefile
+library(sf)
+library(tmap)
+neighborhood <- sf::st_read("NewHaven_NeighbhorhoodBoundaries.shp")
+
+# Check the structure of the shapefile
+print(neighborhood)
+
+# View the shapefile on a simple map
+tmap_mode("view")  # Set interactive view mode
+tm_shape(neighborhood) + 
+  tm_borders(col = "blue")  # Plot boundaries in blue
+#END ----- TO VIEW THE SHAPEFILE
+
+# Now create the spatial boundary for New Haven
+newhaven_boundaries <- sf::st_union(neighborhood)
+
+newhaven_boundaries <- sf::st_union(neighborhood)
+spatial_context <- newhaven_boundaries
+
+# Filter grid points within New Haven boundaries
+grid_id_cntxt <- sapply(sf::st_intersects(grid, spatial_context), function(x) {length(x) > 0})
+grid_contxt <- grid[grid_id_cntxt, ]
+
+# Transform traffic segments CRS
+aadt_segments <- sf::st_transform(aadt_segments, crs = crs)
+
+aadt_segments_id_cntxt <- sapply(sf::st_intersects(aadt_segments, spatial_context), function(x) {length(x) > 0})
+aadt_segments_contxt <- aadt_segments[aadt_segments_id_cntxt, ]
+aadt_segments_contxt <- sf::st_cast(aadt_segments_contxt, "LINESTRING")
+
+# Select three points per line to represent street segments for interpolation
+n_points <- 3
+road_points <- sf::st_transform(aadt_segments_contxt, crs) %>%
+  sf::st_line_sample(n = n_points, type = "regular") %>%
+  sf::st_cast("POINT") 
+
+aadt_segments_p <- st_sf(aadt = rep(aadt_segments_contxt$aadt, each = n_points), geom = road_points)
+
+# kriging from mid point 
+# adapted from Criado et al. (2022) https://earth.bsc.es/gitlab/es/universalkriging/-/blob/production/general/UK_mean.R
+#POTENTIALLY DELETE ALL OF THIS ---------------------------
+# DID NOT HAVE THE FUNCTION REGRID_OK
+find("regrid_ok")
+#character(0)
+
+#replace regrid_ok with manual Kriging model
+sum(is.na(aadt_segments_p$aadt))
+#2199 out of 5613
+#NOT GREAT ASK DANIEL
+
+#remove NAs
+aadt_segments_p <- aadt_segments_p[!is.na(aadt_segments_p$aadt), ]
+
+#END -----------------
+
+###REDO THIS PART WTF
+##THIS WAS WHAT WE WERE SUPPOSED TO USE BASED ON BENAVIDES... BUT did not have _ok function
+UK_mean_uniform_ok <- regrid_ok(non_uniform_data = sf::as_Spatial(aadt_segments_p), # traffic_esri_cntxt
+                                target_grid = sf::as_Spatial(grid_contxt), crs_sim = crs) # grid_contxt
+colnames(UK_mean_uniform_ok)[1] <- "aadt"
+UK_mean_uniform_ok$GEOID20 <- grid_contxt$GEOID20
+saveRDS(UK_mean_uniform_ok, "generated_data/traffic_segment_2_grid_sld_newhaven.rds")
