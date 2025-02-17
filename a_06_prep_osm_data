@@ -1,0 +1,88 @@
+#a_06_prep_osm_data.R
+
+# set coordinate reference system
+crs <- 2163
+
+### load data
+us_cont_bbox <- sf::st_as_sfc(sf::st_bbox(c(xmin = -130, xmax = -60, ymax = 51, ymin = 21), crs = 4326)) %>%
+  sf::st_transform(2163)  # Convert bbox to the same CRS
+
+#test-block specific to connecticut
+test_bbox_ct <- sf::st_as_sfc(sf::st_bbox(c(xmin = -73.7, xmax = -71.8, ymax = 42.1, ymin = 40.9), crs = 4326))
+
+#Verify the test-block area----------
+# Load required packages
+install.packages("tmap")  # Install if not already installed
+library(sf)
+library(tmap)
+
+# Define Connecticut bounding box
+test_bbox_ct <- sf::st_as_sfc(sf::st_bbox(c(xmin = -73.7, xmax = -71.8, ymax = 42.1, ymin = 40.9), crs = 4326))
+
+# Set tmap to interactive view mode
+tmap_mode("view")
+
+# Plot the bounding box
+tm_shape(test_bbox_ct) + 
+  tm_borders(col = "red", lwd = 2) +  # Red border for visibility
+  tm_layout(title = "Test Bounding Box - Connecticut")
+#END ----------------------------
+
+us_boundaries <- sf::st_read("cb_2018_us_nation_20m/cb_2018_us_nation_20m.shp") %>%
+  sf::st_transform(2163) %>%
+  sf::st_intersection(us_cont_bbox)
+
+neighborhood <- sf::st_read("NewHaven_NeighbhorhoodBoundaries.shp") %>%
+  sf::st_transform(crs) %>%
+  sf::st_union()
+
+## road characteristics (make query for osm data)
+driving_network_v_t_opts <- c(
+  "-where", "
+    (highway IS NOT NULL)
+    AND
+    (highway NOT IN (
+    'abandoned', 'bus_guideway', 'byway', 'construction', 'corridor', 'elevator',
+    'fixme', 'escalator', 'gallop', 'historic', 'no', 'planned', 'platform',
+    'proposed', 'cycleway', 'pedestrian', 'bridleway', 'path', 'footway',
+    'steps'
+    ))
+    AND
+    (access NOT IN ('private', 'no'))
+    AND
+    (service NOT ILIKE 'private%')
+    ")
+
+driving_network_ext_tgs <- c("lanes", "maxspeed", "access", "service", "barrier", "surface", "tiger:cfcc", "parking:lane:both", "parking:lane:left", "parking:lane:right")
+
+# Define the path to the Connecticut OSM data file
+getwd()
+file.exists("connecticut-latest.osm.pbf")
+#TRUE 
+
+pbf = file.path("connecticut-latest.osm.pbf")
+
+# Road network and parking data call
+#HAD TO RUN THIS CODE IN MY TERMINAL FIRST
+#ls -l /Users/alinemaybank/Desktop/newhaven_csi
+#chmod -R u+w /Users/alinemaybank/Desktop/newhaven_csi
+
+osmextract::oe_vectortranslate(
+  pbf,
+  layer = "lines",
+  vectortranslate_options = driving_network_v_t_opts,
+  osmconf_ini = NULL,
+  extra_tags = driving_network_ext_tgs,
+  force_vectortranslate = TRUE,
+  never_skip_vectortranslate = FALSE,
+  boundary = NULL,
+  boundary_type = c("spat", "clipsrc"),
+  quiet = FALSE)
+
+# Storing the just saved file in a known path and delete unused variables
+osm_driving_network <- osmextract::oe_read("connecticut-latest.gpkg")
+unused_vars_ind <- which(colnames(osm_driving_network) %in% c("waterway", "aerialway", "man_made"))
+osm_driving_network <- osm_driving_network[,-unused_vars_ind]
+
+# Save the processed road network data
+saveRDS(osm_driving_network, "generated_data/osm_driving_network_connecticut.rds")
