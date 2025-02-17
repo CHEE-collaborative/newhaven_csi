@@ -1,0 +1,113 @@
+#a_09_put_together_inputs_to_csi.R
+
+#Packages
+library(dplyr)
+install.packages("qwraps2")
+library(qwraps2)
+
+# set coordinate reference system
+crs <- 2163
+
+# read data inputs
+traffic_count_2_grid_sld_newhaven <- readRDS("generated_data/traffic_count_2_grid_sld_newhaven.rds")
+traffic_segment_2_grid_sld_newhaven <- readRDS("generated_data/traffic_segment_2_grid_sld_newhaven.rds")
+road_inf_dist_2_grid_sld_newhaven <- readRDS("generated_data/road_inf_dist_2_grid_sld_newhaven.rds")
+barrier_factor_newhaven <- readRDS("generated_data/barrier_sp_units_newhaven_for_use.rds")
+traffic_co2_emis_newhaven <- readRDS("generated_data/traffic_co2_emis_newhaven.rds")
+
+# load grids and smart location dataset subset
+data_desc <- readRDS("generated_data/smart_location_data_subset_desc.rds")
+sld_us_loc <- readRDS("generated_data/smart_location_data_subset.rds")
+grid <- sf::st_centroid(sld_us_loc) %>%
+  sf::st_transform(crs)
+
+# load testing areas
+# obtain a spatial context for an example
+neighborhood <- sf::st_read("NewHaven_NeighbhorhoodBoundaries.shp") %>%
+  sf::st_transform(crs)
+
+newhaven_boundaries <- sf::st_union(neighborhood)
+spatial_context <- newhaven_boundaries
+
+# read urban grid
+grid_id_cntxt <- sapply(sf::st_intersects(grid, spatial_context),function(x){length(x)>0})
+grid_contxt <- grid[grid_id_cntxt, ]
+sld_us_loc_df <- grid_contxt
+sf::st_geometry(sld_us_loc_df) <- NULL
+
+# subset data for community severance index estimation
+sld_us_loc_df <- sld_us_loc_df[,c("GEOID20",  
+                                  "D3AAO", "D3APO", 
+                                  "D3B", "D3BAO", "NatWalkInd")]
+colnames(sld_us_loc_df)[c(2:5)] <- c("autom_netw_dens", "pedest_netw_dens", "street_no_autom_inters_dens", "autom_inters_dens")
+
+sld_us_loc_df <- as.data.frame(sld_us_loc_df)
+
+#CHANGED THIS FROM BENAVIDES
+#BENAVIDES DID --> sld_us_loc_df <- dplyr::na_if(sld_us_loc_df, -99999)
+#But, dplyr::na_if() is designed to work on individual vectors, not an entire data frame. 
+#However, sld_us_loc_df is a data frame, so the function fails when applied directly to it.
+
+sld_us_loc_df <- sld_us_loc_df %>%
+  dplyr::mutate(across(where(is.numeric), ~ dplyr::na_if(.x, -99999)))
+
+# join data
+traffic_count_2_grid_sld_newhaven_df <- traffic_count_2_grid_sld_newhaven
+sf::st_geometry(traffic_count_2_grid_sld_newhaven_df) <- NULL
+traffic_count_2_grid_sld_newhaven_df <- traffic_count_2_grid_sld_newhaven_df[,c("GEOID20", "aadt")]
+colnames(traffic_count_2_grid_sld_newhaven_df) <- c("GEOID20", "aadt_esri_point")
+
+traffic_segment_2_grid_sld_newhaven_df <- traffic_segment_2_grid_sld_newhaven
+sf::st_geometry(traffic_segment_2_grid_sld_newhaven_df) <- NULL
+traffic_segment_2_grid_sld_newhaven_df <- traffic_segment_2_grid_sld_newhaven_df[,c("GEOID20", "aadt")]
+colnames(traffic_segment_2_grid_sld_newhaven_df) <- c("GEOID20", "aadt_fhwa_segm")
+
+barrier_factor_newhaven <- barrier_factor_newhaven[,c("GEOID20", "barrier_factor_osm", "barrier_factor_fhwa")]
+
+road_inf_dist_2_grid_sld_newhaven_df <- road_inf_dist_2_grid_sld_newhaven
+sf::st_geometry(road_inf_dist_2_grid_sld_newhaven_df) <- NULL
+
+data_in_cs <- dplyr::left_join(sld_us_loc_df, traffic_count_2_grid_sld_newhaven_df, by = "GEOID20") %>%
+  dplyr::left_join(traffic_segment_2_grid_sld_newhaven_df, by = "GEOID20") %>%
+  dplyr::left_join(road_inf_dist_2_grid_sld_newhaven_df, by = "GEOID20") %>%
+  dplyr::left_join(traffic_co2_emis_newhaven, by = "GEOID20") %>%
+  dplyr::left_join(barrier_factor_newhaven, by = "GEOID20")
+
+# manuscript Table 2
+# explore summary descriptive
+#I had to change this code a bit too to make it run
+#ORIGINAL:
+#summ_data_in_cs <- sumtable(data_in_cs, out = "return")
+summ_data_in_cs <- summary(data_in_cs, out = "return")
+
+colnames(data_desc)[1] <- "Variable"
+summ_data_in_cs <- dplyr::left_join(summ_data_in_cs, data_desc, by = "Variable")
+
+#I keep getting the error that: 
+#Error in UseMethod("left_join") : 
+#no applicable method for 'left_join' applied to an object of class "table"
+#so i added this:
+summ_stats <- do.call(rbind, lapply(data_in_cs, summary))  # Transpose summary output
+summ_data_in_cs <- data.frame(Variable = rownames(summ_stats), summ_stats)  # Convert to DataFrame
+rownames(summ_data_in_cs) <- NULL  # Remove row names
+
+colnames(data_desc)[1] <- "Variable"
+summ_data_in_cs <- dplyr::left_join(summ_data_in_cs, data_desc, by = "Variable")
+
+# homogenize data ranges by scaling by standard deviation
+data_in_cs_id <- data_in_cs[,c("GEOID20")]
+dta <- data_in_cs[ , -c(which(colnames(data_in_cs) == "GEOID20"))]
+dta_scaled = as.data.frame(apply(dta, 2, function(a) a/sd(a, na.rm = T)))
+dta_prep <- cbind(data_in_cs_id, dta_scaled)
+colnames(dta_prep)[1] <- "GEOID20"
+
+# build dataframe for distributional characteristics (paper table)
+# delete variables distance to road and add proximity based
+
+vtable::st(dta, add.median = T,fit.page = '\\textwidth', digits = 2, out = 'latex')
+
+
+# save data
+dta_prep <- cbind(data_in_cs_id, dta_scaled)
+colnames(dta_prep)[1] <- "GEOID20"
+saveRDS(dta_prep, "generated_data/community_severance_newhaven_input_data.rds")
