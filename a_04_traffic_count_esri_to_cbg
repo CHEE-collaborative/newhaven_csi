@@ -1,0 +1,52 @@
+#a_04_traffic_count_esri_to_cbg.R
+
+#Packages
+install.packages("automap")
+library(automap)
+
+library(sf)
+
+# set coordinate reference system
+crs <- 2163
+
+neighborhood <- sf::st_read("NewHaven_NeighbhorhoodBoundaries.shp") %>%
+  sf::st_transform(crs)  
+
+newhaven_boundaries <- sf::st_union(neighborhood)
+spatial_context <- newhaven_boundaries
+
+# read data
+# data generated at a_03_prep_traffic.R 
+traffic_esri <- readRDS("Traffic_Counts_esri.rds")
+traffic_esri <- sf::st_transform(traffic_esri, crs)
+colnames(traffic_esri)[which(colnames(traffic_esri) == "Traffic1")] <- "aadt"
+# load grids
+sld_us_loc <- readRDS("generated_data/smart_location_data_subset.rds")
+grid <- sf::st_centroid(sld_us_loc[,c("GEOID20")]) %>%
+  sf::st_transform(crs)
+
+traffic_esri_id_cntxt <- sapply(sf::st_intersects(traffic_esri, spatial_context),function(x){length(x)>0})
+traffic_esri_cntxt <- traffic_esri[traffic_esri_id_cntxt, ]
+
+grid_id_cntxt <- sapply(sf::st_intersects(grid, spatial_context),function(x){length(x)>0})
+grid_contxt <- grid[grid_id_cntxt, ]
+
+# regrid function can be found at code/functions
+#GET THE REGRID FUNCTION TO WORK
+regrid_ok <- function(non_uniform_data, target_grid, crs_sim = "+proj=utm +zone=31 +ellps=intl +units=m +no_defs") {
+  if(isTRUE(class(non_uniform_data) != "SpatialPointsDataFrame")){
+    non_uniform_data <- sp::SpatialPointsDataFrame(non_uniform_data[,c("X", "Y")], non_uniform_data)
+    sp::proj4string(non_uniform_data) <- crs_sim
+  }
+  vf_ok      <- automap::autofitVariogram(aadt ~ 1, non_uniform_data)
+  ok_regular <- gstat::gstat(formula = aadt ~ 1, data = non_uniform_data, model = vf_ok$var_model, nmax = 20) 
+  regular <- predict(ok_regular, target_grid)
+  regular_sf <- sf::st_as_sf(regular)
+  return(regular_sf)}
+
+UK_mean_uniform_ok <- regrid_ok(non_uniform_data = sf::as_Spatial(traffic_esri_cntxt), # traffic_esri_cntxt
+                                target_grid = sf::as_Spatial(grid_contxt), crs_sim = crs) # grid_contxt
+colnames(UK_mean_uniform_ok)[1] <- "aadt"
+UK_mean_uniform_ok$GEOID20 <- grid_contxt$GEOID20
+
+saveRDS(UK_mean_uniform_ok, "generated_data/traffic_count_2_grid_sld_newhaven.rds")
