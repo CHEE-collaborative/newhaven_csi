@@ -50,3 +50,6 @@ rsconnect/
 
 # data folder
 data/*
+
+# scratch document
+scratch.R
