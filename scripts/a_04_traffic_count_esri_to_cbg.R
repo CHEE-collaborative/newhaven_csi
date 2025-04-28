@@ -41,7 +41,9 @@ traffic_esri <- readRDS(traffic_esri_path)
 ################################################################################
 # Project AADT data to Connecticut coordinate reference system.
 traffic_esri_proj <- sf::st_transform(traffic_esri, ct_crs)
-colnames(traffic_esri)[which(colnames(traffic_esri) == "Traffic1")] <- "aadt"
+colnames(traffic_esri_proj)[
+  which(colnames(traffic_esri_proj) == "Traffic1")
+] <- "aadt"
 
 ################################################################################
 # Load Smart Location Database variables.
@@ -54,10 +56,10 @@ grid <- sf::st_centroid(sld_us_loc[, c("GEOID20")]) %>%
   sf::st_transform(ct_crs)
 
 traffic_esri_id_cntxt <- sapply(
-  sf::st_intersects(traffic_esri, spatial_context),
+  sf::st_intersects(traffic_esri_proj, spatial_context),
   function(x) length(x) > 0
 )
-traffic_esri_cntxt <- traffic_esri[traffic_esri_id_cntxt, ]
+traffic_esri_cntxt <- traffic_esri_proj[traffic_esri_id_cntxt, ]
 
 grid_id_cntxt <- sapply(
   sf::st_intersects(grid, spatial_context),

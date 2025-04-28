@@ -114,4 +114,3 @@ UK_mean_uniform_ok <- regrid_ok(non_uniform_data = sf::as_Spatial(aadt_segments_
 colnames(UK_mean_uniform_ok)[1] <- "aadt"
 UK_mean_uniform_ok$GEOID20 <- grid_contxt$GEOID20
 saveRDS(UK_mean_uniform_ok, paste0(generated.data.folder, "traffic_segment_2_grid_sld_newhaven.rds"))
-

@@ -55,7 +55,7 @@ driving_network_ext_tgs <- c("lanes", "maxspeed", "access", "service", "barrier"
 #They had "us-northeast-latest.osm.pbf" and I used connecticut-latest.osm.pbf
 pbf = file.path(paste0(geometry.data.folder, "connecticut-latest.osm.pbf"))
 
-# road network and parking data call 
+# road network and parking data call
 osmextract::oe_vectortranslate(
   pbf,
   layer = "lines",
