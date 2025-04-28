@@ -48,8 +48,9 @@ po/*~
 # RStudio Connect folder
 rsconnect/
 
-# data folder
+# data folder except for README.md
 data/*
+!data/README.md
 
 # scratch document
 scratch.R
