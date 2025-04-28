@@ -1,4 +1,4 @@
-###### Prepare traffic dataset from ESRI US Traffic Counts data.
+# Prepare traffic dataset from ESRI US Traffic Counts data.
 
 ################################################################################
 # Install `remotes` and `esri2sf` packages.

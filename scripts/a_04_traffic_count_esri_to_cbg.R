@@ -1,46 +1,87 @@
-#ALINE: Changes in this script include:
-#1. nyc borough shapefile --> new haven neighborhood shapefile
-#2. nomenclature shifts: boroughs --> neighborhoods; nyc=newhaven; newyorkcity=newhaven
+# ALINE: Changes in this script include:
+# 1. nyc borough shapefile -> new haven neighborhood shapefile
+# 2. nomenclature shifts: boroughs -> neighborhoods;
+#    nyc -> newhaven; newyorkcity -> newhaven
+# Interpolate traffic intensity data to census block groups
 
-#a_04_traffic_count_esri.cbg.R
-# script aim: interpolate traffic intensity data to census block groups
-# First step to load packages etc.
-# 1a Declare root directory, folder locations and load essential stuff
-project.folder = paste0(print(here::here()),'/')
-source(paste0(project.folder,'init_directory_structure.R'))
-source(paste0(functions.folder,'script_initiate.R'))
+################################################################################
+# Declare root directory, folder locations and load essential stuff
+dir_home <- file.path(here::here())
+dir_data <- file.path(dir_home, "data")
+dir_input <- file.path(dir_data, "input")
+dir_output <- file.path(dir_data, "output")
 
-# set coordinate reference system
-crs <- 2163
+################################################################################
+# Set coordinate reference system to Connecticut state plane
+# https://epsg.io/2234.
+ct_crs <- 2234
 
-neighborhoods <- sf::st_read(paste0(demography.data.folder, "NewHaven_NeighbhorhoodBoundaries.shp")) %>%
-  sf::st_transform(crs)
+################################################################################
+# Import neighborhood boundary data.
+neighborhoods_path <- file.path(
+  dir_input,
+  "NewHaven_NeighbhorhoodBoundaries",
+  "NewHaven_NeighbhorhoodBoundaries.shp"
+)
+testthat::expect_true(file.exists(neighborhoods_path))
+neighborhoods <- sf::st_read(neighborhoods_path) %>%
+  sf::st_transform(ct_crs)
 
+################################################################################
+# Merge neighborhoods for New Haven boundary.
 newhaven_boundaries <- sf::st_union(neighborhoods)
 spatial_context <- newhaven_boundaries
-# read data
-# data generated at a_03_prep_traffic.R 
-traffic_esri <- readRDS(paste0(generated.data.folder, "traffic_counts_esri.rds"))
-traffic_esri <- sf::st_transform(traffic_esri, crs)
+
+################################################################################
+# Import AADT data generated in a_03_prep_traffic.R
+traffic_esri_path <- file.path(dir_output, "a_03", "traffic_counts_esri.rds")
+testthat::expect_true(file.exists(traffic_esri_path))
+traffic_esri <- readRDS(traffic_esri_path)
+
+################################################################################
+# Project AADT data to Connecticut coordinate reference system.
+traffic_esri_proj <- sf::st_transform(traffic_esri, ct_crs)
 colnames(traffic_esri)[which(colnames(traffic_esri) == "Traffic1")] <- "aadt"
 
-#CONTINUE HERE
-# load grids
-sld_us_loc <- readRDS(paste0(generated.data.folder, "smart_location_data_subset.rds"))
-grid <- sf::st_centroid(sld_us_loc[,c("GEOID20")]) %>%
-  sf::st_transform(crs)
+################################################################################
+# Load Smart Location Database variables.
+sld_us_loc_path <- file.path(
+  dir_output, "a_01", "smart_location_data_subset.rds"
+)
+testthat::expect_true(file.exists(sld_us_loc_path))
+sld_us_loc <- readRDS(sld_us_loc_path)
+grid <- sf::st_centroid(sld_us_loc[, c("GEOID20")]) %>%
+  sf::st_transform(ct_crs)
 
-traffic_esri_id_cntxt <- sapply(sf::st_intersects(traffic_esri, spatial_context),function(x){length(x)>0})
+traffic_esri_id_cntxt <- sapply(
+  sf::st_intersects(traffic_esri, spatial_context),
+  function(x) length(x) > 0
+)
 traffic_esri_cntxt <- traffic_esri[traffic_esri_id_cntxt, ]
 
-grid_id_cntxt <- sapply(sf::st_intersects(grid, spatial_context),function(x){length(x)>0})
+grid_id_cntxt <- sapply(
+  sf::st_intersects(grid, spatial_context),
+  function(x) length(x) > 0
+)
 grid_contxt <- grid[grid_id_cntxt, ]
 
-# regrid function can be found at code/functions
+################################################################################
+# Apply regrid_ok function
+# From https://github.com/jaime-benavides/community_severance_nyc/blob/main/code/functions/functions.R
+source(file.path(dir_home, "R", "regrid_ok.R"))
+uk_mean_uniform_ok <- regrid_ok(
+  non_uniform_data = sf::as_Spatial(traffic_esri_cntxt), # traffic_esri_cntxt
+  target_grid = sf::as_Spatial(grid_contxt),
+  crs_sim = ct_crs
+) # grid_contxt
+colnames(uk_mean_uniform_ok)[1] <- "aadt"
+uk_mean_uniform_ok$GEOID20 <- grid_contxt$GEOID20
 
-UK_mean_uniform_ok <- regrid_ok(non_uniform_data = sf::as_Spatial(traffic_esri_cntxt), # traffic_esri_cntxt
-                                target_grid = sf::as_Spatial(grid_contxt), crs_sim = crs) # grid_contxt
-colnames(UK_mean_uniform_ok)[1] <- "aadt"
-UK_mean_uniform_ok$GEOID20 <- grid_contxt$GEOID20
-
-saveRDS(UK_mean_uniform_ok, paste0(generated.data.folder, "traffic_count_2_grid_sld_newhaven.rds"))
+################################################################################
+# Save output.
+uk_mean_uniform_ok_path <- file.path(
+  dir_output, "a_04", "traffic_count_2_grid_sld_newhaven.rds"
+)
+if (!file.exists(uk_mean_uniform_ok_path)) {
+  saveRDS(uk_mean_uniform_ok, uk_mean_uniform_ok_path)
+}
