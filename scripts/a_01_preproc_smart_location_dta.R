@@ -2,9 +2,10 @@
 # script aim: This script is preparing spatial data sets for this study from Smart Location Database
 # First step to load packages etc.
 # 1a Declare root directory, folder locations and load essential stuff
-project.folder = paste0(print(here::here()),'/')
-source(paste0(project.folder,'init_directory_structure.R'))
-source(paste0(functions.folder,'script_initiate.R'))
+project.folder <- file.path(here::here())
+data.folder <- file.path(project.folder, "data")
+source(paste0(project.folder, "init_directory_structure.R"))
+source(paste0(functions.folder, "script_initiate.R"))
 
 ### set resolution
 crs <- 2163 #
@@ -15,12 +16,12 @@ sld_us <- sf::read_sf(paste0(geometry.data.folder, "SmartLocationDatabase.gdb"))
 
 #Selection of urban spatial variables, details in table 1 of manuscript (Jaime, you can add more details or delete if it's incorrect)
 var_name <- c("GEOID20", "STATEFP", "COUNTYFP", "TRACTCE", "BLKGRPCE",
-              "Ac_Total", "Ac_Unpr", 
-              "TotPop", "CountHU", "HH", "P_WrkAge", 
-              "AutoOwn0", "AutoOwn1", "AutoOwn2p", 
+              "Ac_Total", "Ac_Unpr",
+              "TotPop", "CountHU", "HH", "P_WrkAge",
+              "AutoOwn0", "AutoOwn1", "AutoOwn2p",
               "Workers", "R_LowWageWk", "R_MedWageWk", "R_HiWageWk",
               "D1A", "D1B", "D1C",
-              "D2B_E8MIXA", "D2A_EPHHM", 
+              "D2B_E8MIXA", "D2A_EPHHM",
               "D3A", "D3AAO", "D3AMM", "D3APO",
               "D3B", "D3BAO", "D3BMM3", "D3BMM4", "D3BPO3", "D3BPO4",
               "D4A",
