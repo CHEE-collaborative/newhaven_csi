@@ -1,8 +1,7 @@
 # ALINE: I DID NOT CHANGE ANYTHING IN THIS SCRIPT FROM THE ORIGINAL CODE
 # FROM BENAVIDES:
 # https://github.com/jaime-benavides/community_severance_nyc/blob/main/code/data_prep/a_01_preproc_smart_location_dta.R
-# This script prepares spatial data sets from Smart Location Database.
-# First step to load packages etc.
+# Prepare spatial data sets from Smart Location Database.
 
 ################################################################################
 # Declare root directory, folder locations and load essential stuff

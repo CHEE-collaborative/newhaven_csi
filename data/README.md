@@ -16,3 +16,6 @@ unzip("USER_PATH/Downloads/newhaven_csi_data.zip", exdir = "USER_PATH/newhaven_c
 - a_01/
   - `smart_location_data_subset.rds`: SLD filtered to 44 variables of interest
   - `smart_location_data_subset_desc.rds`: Variable descriptions and sources for SLD variables
+- a_03/
+  - `aadt_ct_2022.rds`: [BUG] See `a_03_prep_traffic.R` Line 30
+  - `traffic_counts_esri.rds`: Average Annual Daily Traffic (AADT) data from ESRI
