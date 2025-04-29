@@ -13,9 +13,11 @@ Remake of the Community Severance Index for New Haven based on the code by Benav
 - Output(s): `data/output/a_03/aadt_ct_2022.rds`, `data/output/a_03/traffic_counts.esri.rds`
 
 `a_04_traffic_count_esri_to_cbg.R`
-- Interpolate traffic intensity data to census block groups.
+- Interpolate traffic intensity (counts) data to census block groups.
 - Input(s): `data/output/a_01/smart_location_data_subset.rds`, `data/output/a_03/traffic_counts_esri.rds`, `R/regrid_ok.R`
-- Output(s): 
+- Output(s): `data/output/a_04/traffic_count_2_grid_sld_newhaven.rds`
 
-## data/
-Folder containing raw input (`input/`) and processed output (`output/`) data.
+`a_05_traffic_segment
+- Interpolate traffic intensity (segments) data to census block groups.
+- Input(s): `data/output/a_01/smart_location_data_subset.rds`, `data/output/a_03/traffic_counts_esri.rds`, `R/regrid_ok.R`
+- Output(s): `data/output/a_05/traffic_segment_2_grid_sld_newhaven.rds`
