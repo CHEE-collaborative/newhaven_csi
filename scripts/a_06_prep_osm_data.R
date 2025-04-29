@@ -30,11 +30,12 @@ us_cont_bbox <- sf::st_as_sfc(
   )
 )
 # The test_bbox is for NYC, so I changed it to be for New Haven
-# test_bbox <- sf::st_as_sfc(sf::st_bbox(c(xmin = -73.8, xmax = -74.1, ymax = 41.2, ymin = 40.4), crs = 4326)) 
 # New Haven Bounding Box
 test_bbox <- sf::st_as_sfc(
-  sf::st_bbox(c(xmin = -73.0, xmax = -72.85,ymax = 41.36, ymin = 41.23),
-  crs = ct_crs)
+  sf::st_bbox(
+    c(xmin = -73.0, xmax = -72.85,ymax = 41.36, ymin = 41.23),
+    crs = ct_crs
+  )
 )
 
 ################################################################################
@@ -94,8 +95,7 @@ osmextract::oe_vectortranslate(
 ################################################################################
 # Storing the just saved file in a known path and delete unused variables
 # They say raw below, but they originally had the file in geometry, so i am
-# keeping it there
-# osm_driving_network <- osmextract::oe_read(paste0(raw.data.folder, "us-northeast-latest.gpkg"))
+# keeping it there.
 osm_driving_network <- osmextract::oe_read(
   file.path(dir_input, "connecticut-latest.gpkg")
 )

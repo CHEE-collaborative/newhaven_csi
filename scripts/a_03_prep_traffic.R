@@ -41,4 +41,4 @@ aadt_path <- file.path(dir_output, "a_02", "traffic_counts_esri.rds")
 if (!file.exists(aadt_path)) saveRDS(aadt_df, aadt_path)
 
 fhwa_path <- file.path(dir_output, "a_02", "aadt_ct_2022.rds")
-if (!file.exists(fhwa_path)) saveRDS(fhwa_path, df_ct)
+if (!file.exists(fhwa_path)) saveRDS(ct_df, fhwa_path)
