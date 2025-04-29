@@ -17,6 +17,8 @@ unzip("USER_PATH/Downloads/newhaven_csi_data.zip", exdir = "USER_PATH/newhaven_c
   - Folder containing shapefile (`.shp`) and supporting files for United States boundaries data.
 - `connecticut-latest.gpkg`
   - Geopackage containing [FILL] Connecticut data.
+- `DARTE_v2.gdb`
+  - Geodatabase containing traffic CO2 emission data.
 
 ## output/
 - a_01/
@@ -31,3 +33,6 @@ unzip("USER_PATH/Downloads/newhaven_csi_data.zip", exdir = "USER_PATH/newhaven_c
   - `traffic_segment_2_grid_sld_newhaven.rds`: Traffic intensity (segments) data interpolated to census block groups. [BUG] See `a_05_traffic_segment_hpms_to_cbg.R` for missing AADT data values during interpolation.
 - a_06/
   - `osm_driving_network_northeast.rds`: OpenStreetMap driving network data for the Northeastern United Staes.
+- a_07/
+- a_08/
+  - `traffic_co2_emis_newhaven.rds`: Traffic CO2 emission data at census block groups.

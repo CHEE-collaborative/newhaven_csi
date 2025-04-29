@@ -26,3 +26,13 @@ Remake of the Community Severance Index for New Haven based on the code by Benav
 - Prepare OpenStreetMaps data.
 - Input(s): `data/input/nation/cb_2018_us_nation_20m.shp`, `data/input/connecticut-latest.osm.pbf`
 - Output(s): `data/input/connecticut-latest.gpkg`, `data/output/a_06/osm_driving_network_northeast.rds`
+
+`a_07_road_infrastructure_dist_to_cbg.R`
+- Generate road infrastructure input data.
+- Input(s):
+- Output(s):
+
+`a_08_traffic_co2_emissions_to_cbg.R`
+- Prepare traffic CO2 emissions.
+- Input(s): `data/input/DARTE_v2.gdb`
+- Output(s): `data/output/a_08/traffic_co2_emis_newhaven.rds`
