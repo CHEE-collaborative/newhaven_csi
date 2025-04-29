@@ -24,5 +24,5 @@ Remake of the Community Severance Index for New Haven based on the code by Benav
 
 `a_06_prep_osm_data.R`
 - Prepare OpenStreetMaps data.
-- Input(s): `data/input/nation/cb_2018_us_nation_20m.shp`, `data/input/connecticut-latest.gpkg`
-- Output(s): `data/output/a_06/osm_driving_network_northeast.rds`
+- Input(s): `data/input/nation/cb_2018_us_nation_20m.shp`, `data/input/connecticut-latest.osm.pbf`
+- Output(s): `data/input/connecticut-latest.gpkg`, `data/output/a_06/osm_driving_network_northeast.rds`

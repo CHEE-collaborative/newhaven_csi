@@ -32,28 +32,20 @@ us_cont_bbox <- sf::st_as_sfc(
 # The test_bbox is for NYC, so I changed it to be for New Haven
 # test_bbox <- sf::st_as_sfc(sf::st_bbox(c(xmin = -73.8, xmax = -74.1, ymax = 41.2, ymin = 40.4), crs = 4326)) 
 # New Haven Bounding Box
-test_bbox <- sf::st_as_sfc(sf::st_bbox(c(xmin = -73.0, xmax = -72.85,ymax = 41.36, ymin = 41.23), crs = 2163))
+test_bbox <- sf::st_as_sfc(
+  sf::st_bbox(c(xmin = -73.0, xmax = -72.85,ymax = 41.36, ymin = 41.23),
+  crs = ct_crs)
+)
 
 ################################################################################
 # Import US boundary data.
 us_boundaries_path <- file.path(
   dir_input, "nation", "cb_2018_us_nation_20m.shp"
 )
+testthat::expect_true(file.exists(us_boundaries_path))
 us_boundaries <- sf::st_read(us_boundaries_path)
 us_boundaries_proj <- sf::st_transform(us_boundaries, ct_crs)
 us_boundaries_crop <- sf::st_intersection(us_boundaries_proj, us_cont_bbox)
-
-################################################################################
-# Load neighborhoods.
-neighborhoods_path <- file.path(
-  dir_input,
-  "NewHaven_NeighbhorhoodBoundaries",
-  "NewHaven_NeighbhorhoodBoundaries.shp"
-)
-testthat::expect_true(file.exists(neighborhoods_path))
-neighborhoods <- sf::st_read(neighborhoods_path) %>%
-  sf::st_transform(ct_crs) %>%
-  sf::st_union()
 
 ################################################################################
 # Road characteristics (make query for osm data).
@@ -80,7 +72,8 @@ driving_network_ext_tgs <- c(
 ################################################################################
 # Save OpenStreetMap as .pbf
 # They had "us-northeast-latest.osm.pbf" and I used connecticut-latest.osm.pbf
-pbf <- file.path(dir_output, "a_06", "connecticut-latest.osm.pbf")
+pbf <- file.path(dir_input, "connecticut-latest.osm.pbf")
+testthat::expect_true(file.exists(pbf))
 
 ################################################################################
 # road network and parking data call.
@@ -106,10 +99,13 @@ osmextract::oe_vectortranslate(
 osm_driving_network <- osmextract::oe_read(
   file.path(dir_input, "connecticut-latest.gpkg")
 )
-unused_vars_ind <- which(
-  colnames(osm_driving_network) %in% c("waterway", "aerialway", "man_made")
+osm_driving_network_proj <- sf::st_transform(
+  osm_driving_network, ct_crs
 )
-osm_driving_network <- osm_driving_network[,-unused_vars_ind]
+unused_vars_ind <- which(
+  colnames(osm_driving_network_proj) %in% c("waterway", "aerialway", "man_made")
+)
+osm_driving_network_proj <- osm_driving_network_proj[, -unused_vars_ind]
 
 ################################################################################
 # Save output.
@@ -117,5 +113,5 @@ osm_driving_network_path <- file.path(
   dir_output, "a_06", "osm_driving_network_northeast.rds"
 )
 if (!file.exists(osm_driving_network_path)) {
-  saveRDS(osm_driving_network, osm_driving_network_path)
+  saveRDS(osm_driving_network_proj, osm_driving_network_path)
 }
