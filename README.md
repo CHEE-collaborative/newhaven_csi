@@ -17,7 +17,12 @@ Remake of the Community Severance Index for New Haven based on the code by Benav
 - Input(s): `data/output/a_01/smart_location_data_subset.rds`, `data/output/a_03/traffic_counts_esri.rds`, `R/regrid_ok.R`
 - Output(s): `data/output/a_04/traffic_count_2_grid_sld_newhaven.rds`
 
-`a_05_traffic_segment
+`a_05_traffic_segment_hpms_to_cbg.R`
 - Interpolate traffic intensity (segments) data to census block groups.
 - Input(s): `data/output/a_01/smart_location_data_subset.rds`, `data/output/a_03/traffic_counts_esri.rds`, `R/regrid_ok.R`
 - Output(s): `data/output/a_05/traffic_segment_2_grid_sld_newhaven.rds`
+
+`a_06_prep_osm_data.R`
+- Prepare OpenStreetMaps data.
+- Input(s): `data/input/nation/cb_2018_us_nation_20m.shp`, `data/input/connecticut-latest.gpkg`
+- Output(s): `data/output/a_06/osm_driving_network_northeast.rds`
