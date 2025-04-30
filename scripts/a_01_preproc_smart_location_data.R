@@ -1,32 +1,31 @@
 # ALINE: I DID NOT CHANGE ANYTHING IN THIS SCRIPT FROM THE ORIGINAL CODE
 # FROM BENAVIDES:
 # https://github.com/jaime-benavides/community_severance_nyc/blob/main/code/data_prep/a_01_preproc_smart_location_dta.R
-# Prepare spatial data sets from Smart Location Database.
+# Prepare spatial data sets from Smart Location Database (SLD).
 
 ################################################################################
-# Declare root directory, folder locations and load essential stuff
-source(file.path(here::here(), "R/helpers.R"))
-csi_directories()
+# Source variables from a_00_initiate.R
+source(file.path(here::here(), "scripts", "a_00_initiate.R"))
 
 ################################################################################
-# Import data from smart location database (from Benavides readme)
-sld_zip_path <- file.path(dir_input, "SmartLocationDatabaseV3.zip")
-sld_path <- file.path(dir_input, "SmartLocationDatabase.gdb")
-if (!file.exists(sld_path) && file.exists(sld_zip_path)) {
-  unzip(sld_zip_path, exdir = file.path(dir_data, "input"))
+# Identify and unzip (if necessary) SLD data files.
+chr_sld_zip_path <- file.path(dir_input, "SmartLocationDatabaseV3.zip")
+chr_sld_path <- file.path(dir_input, "SmartLocationDatabase.gdb")
+if (!file.exists(chr_sld_path) && file.exists(chr_sld_zip_path)) {
+  unzip(chr_sld_zip_path, exdir = file.path(dir_input))
 }
-testthat::expect_true(file.exists(sld_path))
-sld_us <- sf::read_sf(sld_path)
-class(sld_us)
-dim(sld_us)
-names(sld_us)
+testthat::expect_true(file.exists(chr_sld_path))
 
 ################################################################################
-# Filter to selection of urban spatial variables
-# Details in table 1 of manuscript
-# (Jaime, you can add more details or delete if it's incorrect)
-# Unique variable names.
-var_name <- c(
+# Import SLD data as an sf object and inspect metadata.
+sf_sld <- sf::st_read(chr_sld_path)
+class(sf_sld)
+dim(sf_sld)
+names(sf_sld)
+
+################################################################################
+# Define vectors of unique variable names, descriptions, and data sources.
+chr_varnames <- c(
   "GEOID20",
   "STATEFP",
   "COUNTYFP",
@@ -72,8 +71,7 @@ var_name <- c(
   "NatWalkInd"
 )
 
-# Unique variable descriptoins
-desc <- c(
+chr_descriptions <- c(
   "Census block group 12-digit FIPS code (2018)",
   "State FIPS code", "County FIPS code",
   "Census tract FIPS code in which CBG resides",
@@ -118,8 +116,7 @@ desc <- c(
   "Walkability Index"
 )
 
-# Data sources.
-source <- c(
+chr_sources <- c(
   "2019 Census TIGER/Line",
   "2019 Census TIGER/Line",
   "2019 Census TIGER/Line",
@@ -169,33 +166,39 @@ source <- c(
 
 ################################################################################
 # Data checks.
-testthat::expect_true(all(var_name %in% colnames(sld_us)))
-testthat::expect_true(length(var_name) == length(desc))
-testthat::expect_true(length(var_name) == length(source))
+testthat::expect_true(all(chr_varnames %in% colnames(sf_sld)))
+testthat::expect_true(length(chr_varnames) == length(chr_descriptions))
+testthat::expect_true(length(chr_varnames) == length(chr_sources))
 
-data_desc <- data.frame(
-  var_name = var_name,
-  description = desc,
-  source = source
+################################################################################
+# Merge variable names, descriptions, and sources into a data frame.
+df_sld <- data.frame(
+  varname = chr_varnames,
+  description = chr_descriptions,
+  source = chr_sources
 )
 
 ################################################################################
-# Subset variables from smart location dataset
-sld_us_loc <- sld_us[, which(colnames(sld_us) %in% var_name)]
-class(sld_us_loc)
-dim(sld_us_loc)
-names(sld_us_loc)
+# Subset SLD to variables of interest
+sf_sld_variables <- sf_sld[, which(colnames(sf_sld) %in% chr_varnames)]
+class(sf_sld_variables)
+dim(sf_sld_variables)
+names(sf_sld_variables)
+
+################################################################################
+# Project to Connecticut CRS.
+sf_sld_variables_proj <- sf::st_transform(sf_sld_variables, crs = int_crs_ct)
 
 ################################################################################
 # Save output.
-sld_us_loc_path <- file.path(
-  dir_output, "a_01", "smart_location_data_subset.rds"
-)
-if (!file.exists(sld_us_loc_path)) saveRDS(sld_us_loc, sld_us_loc_path)
-testthat::expect_true(file.exists(sld_us_loc_path))
+chr_sld_variables_path <- file.path(dir_output, "a_01", "sf_sld_variables.rds")
+if (!file.exists(chr_sld_variables_path)) {
+  saveRDS(sf_sld_variables_proj, chr_sld_variables_path)
+}
+testthat::expect_true(file.exists(chr_sld_variables_path))
 
-data_desc_path <- file.path(
-  dir_output, "a_01", "smart_location_data_subset_desc.rds"
-)
-if (!file.exists(data_desc_path)) saveRDS(data_desc, data_desc_path)
-testthat::expect_true(file.exists(data_desc_path))
+chr_sld_desc_path <- file.path(dir_output, "a_01", "df_sld.rds")
+if (!file.exists(chr_sld_desc_path)) {
+  saveRDS(df_sld, chr_sld_desc_path)
+}
+testthat::expect_true(file.exists(chr_sld_desc_path))

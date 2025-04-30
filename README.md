@@ -1,6 +1,5 @@
 # newhaven_csi
-Remake of the Community Severance Index for New Haven, Connecticut based on *Development of a community severance index for urban areas in the United States: A case study in New York City* (Benavides et al, 2024).
-Links: [journal article](https://www.sciencedirect.com/science/article/pii/S0160412024001120?ref=pdf_download&fr=RR-2&rr=9387bb57b9c37f56), [GitHub repository](https://github.com/jaime-benavides/community_severance_nyc?tab=readme-ov-file)
+Remake of the Community Severance Index for New Haven, Connecticut. Methodology based on *Development of a community severance index for urban areas in the United States: A case study in New York City* (Benavides et al, 2024) ([journal article](https://www.sciencedirect.com/science/article/pii/S0160412024001120?ref=pdf_download&fr=RR-2&rr=9387bb57b9c37f56), [GitHub repository](https://github.com/jaime-benavides/community_severance_nyc?tab=readme-ov-file)).
 
 ## scripts/
 `a_00_initiate.R`
@@ -11,7 +10,7 @@ Links: [journal article](https://www.sciencedirect.com/science/article/pii/S0160
 `a_01_preproc_smart_location_data.R`
 - Preparing spatial data sets from Smart Location Database.
 - Input(s): `data/input/SmartLocationDatabase.gbd`
-- Output(s): `data/output/a_01/smart_location_data_subset.rds`, `data/output/a_01/smart_location_data_subset_desc.rds`
+- Output(s): `data/output/a_01/sf_sld_variables.rds`, `data/output/a_01/df_sld.rds`
 
 `a_02_barrier_factor_prep.R`
 - Prepare barrier factor variables.

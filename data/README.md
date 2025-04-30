@@ -22,18 +22,25 @@ unzip("USER_PATH/Downloads/newhaven_csi_data.zip", exdir = "USER_PATH/newhaven_c
 
 ## output/
 - a_01/
-  - `smart_location_data_subset.rds`: SLD filtered to 44 variables of interest
-  - `smart_location_data_subset_desc.rds`: Variable descriptions and sources for SLD variables
+  - `sf_sld_variables.rds`: SLD data filtered to 44 variables of interest. `sf`
+  - `df_sld.rds`: SLD variable names, descriptions, and sources. `data.frame`
+
 - a_02/
+
 - a_03/
   - `aadt_ct_2022.rds`: [BUG] See `a_03_prep_traffic.R` Line 30
   - `traffic_counts_esri.rds`: Average Annual Daily Traffic (AADT) data from ESRI
+
 - a_04/
   - `traffic_count_2_grid_sld_newhaven.rds`: Traffic intensity data (counts) interpolated to census block groups.
+
 - a_05/
   - `traffic_segment_2_grid_sld_newhaven.rds`: Traffic intensity (segments) data interpolated to census block groups. [BUG] See `a_05_traffic_segment_hpms_to_cbg.R` for missing AADT data values during interpolation.
+
 - a_06/
   - `osm_driving_network_northeast.rds`: OpenStreetMap driving network data for the Northeastern United Staes.
+
 - a_07/
+
 - a_08/
   - `traffic_co2_emis_newhaven.rds`: Traffic CO2 emission data at census block groups.
