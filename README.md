@@ -7,6 +7,11 @@ Remake of the Community Severance Index for New Haven based on the code by Benav
 - Input(s): `data/input/SmartLocationDatabase.gbd`
 - Output(s): `data/output/a_01/smart_location_data_subset.rds`, `data/output/a_01/smart_location_data_subset_desc.rds`
 
+`a_02_barrier_factor_prep.R`
+- Prepare barrier factor variables.
+- Input(s): `data/input/connecticut-latest.osm.pbf`, `data/input/FAF5Network/F5FNEWHAVEN.shp`
+- Output(s): 
+
 `a_03_prep_traffic.R`
 - Preparing traffic data from ESRI respoitories.
 - Output(s): `data/output/a_03/aadt_ct_2022.rds`, `data/output/a_03/traffic_counts.esri.rds`
