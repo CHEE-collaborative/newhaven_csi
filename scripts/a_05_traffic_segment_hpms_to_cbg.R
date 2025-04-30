@@ -1,10 +1,10 @@
 # ALINE: Changes in this script:
-# 1.Benavides used 2019 data for aadt, we used 2022
+# 1. Benavides used 2019 data for aadt, we used 2022
 # 2. nyc borough shapefile -> new haven neighborhood shapefile
 # 3. nomenclature shifts: boroughs -> neighborhoods; nyc -> newhaven;
-# newyorkcity -> newhaven
+#    newyorkcity -> newhaven
 # 4. our aadt_segments_p has misisng values, while the nyc peoeple did not.
-# This may be because nyc has more complete traffic data.
+#    This may be because nyc has more complete traffic data.
 # 5. Related to the kriging analysis later one:
 # Due to the large range of AADT values in New Haven and gaps in data,
 # kriging produced unstable variogram fitting. While the interpolation provides
@@ -14,10 +14,8 @@
 
 ################################################################################
 # Declare root directory, folder locations and load essential stuff
-dir_home <- file.path(here::here())
-dir_data <- file.path(dir_home, "data")
-dir_input <- file.path(dir_data, "input")
-dir_output <- file.path(dir_data, "output")
+source(file.path(here::here(), "R/helpers.R"))
+csi_directories()
 
 ################################################################################
 # Set coordinate reference system to Connecticut state plane

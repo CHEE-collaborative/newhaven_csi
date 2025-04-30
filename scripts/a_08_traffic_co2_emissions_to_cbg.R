@@ -5,10 +5,8 @@
 
 ################################################################################
 # Declare root directory, folder locations and load essential stuff
-dir_home <- file.path(here::here())
-dir_data <- file.path(dir_home, "data")
-dir_input <- file.path(dir_data, "input")
-dir_output <- file.path(dir_data, "output")
+source(file.path(here::here(), "R/helpers.R"))
+csi_directories()
 
 ################################################################################
 # Set coordinate reference system to Connecticut state plane

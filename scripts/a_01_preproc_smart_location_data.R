@@ -5,15 +5,13 @@
 
 ################################################################################
 # Declare root directory, folder locations and load essential stuff
-dir_home <- file.path(here::here())
-dir_data <- file.path(dir_home, "data")
-dir_input <- file.path(dir_data, "input")
-dir_output <- file.path(dir_data, "output")
+source(file.path(here::here(), "R/helpers.R"))
+csi_directories()
 
 ################################################################################
 # Import data from smart location database (from Benavides readme)
-sld_zip_path <- file.path(dir_data, "input", "SmartLocationDatabaseV3.zip")
-sld_path <- file.path(dir_data, "input",  "SmartLocationDatabase.gdb")
+sld_zip_path <- file.path(dir_input, "SmartLocationDatabaseV3.zip")
+sld_path <- file.path(dir_input, "SmartLocationDatabase.gdb")
 if (!file.exists(sld_path) && file.exists(sld_zip_path)) {
   unzip(sld_zip_path, exdir = file.path(dir_data, "input"))
 }

@@ -8,10 +8,8 @@ library(esri2sf)
 
 ################################################################################
 # Declare root directory, folder locations and load essential stuff
-dir_home <- file.path(here::here())
-dir_data <- file.path(dir_home, "data")
-dir_input <- file.path(dir_data, "input")
-dir_output <- file.path(dir_data, "output")
+source(file.path(here::here(), "R/helpers.R"))
+csi_directories()
 
 ###########################################################################
 # ESRI Annual Average Daily Traffic (AADT) data.
