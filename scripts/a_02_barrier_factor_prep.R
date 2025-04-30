@@ -1,7 +1,7 @@
 # ALINE: Changes in this script include:
 # 1. nyc borough shapefile --> new haven neighborhood shapefile
-# 2. nomenclature shifts: boroughs --> neighborhoods; nyc=newhaven;
-#    newyorkcity=newhaven
+# 2. nomenclature shifts: boroughs --> neighborhoods; nyc = newhaven;
+#    newyorkcity = newhaven
 # 3. osm_driving_network_northeast.rds --> connecticut-latest.osm.pbf
 # 4. roads_ne_us --> roads_CT_us
 # 5. I can't get the two final plots to work
