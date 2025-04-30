@@ -1,3 +1,4 @@
+################################################################################
 # ALINE: I DID NOT CHANGE ANYTHING IN THIS SCRIPT FROM THE ORIGINAL CODE
 # FROM BENAVIDES:
 # https://github.com/jaime-benavides/community_severance_nyc/blob/main/code/data_prep/a_01_preproc_smart_location_dta.R
@@ -191,7 +192,9 @@ sf_sld_variables_proj <- sf::st_transform(sf_sld_variables, crs = int_crs_ct)
 
 ################################################################################
 # Save output.
-chr_sld_variables_path <- file.path(dir_output, "a_01", "sf_sld_variables.rds")
+chr_sld_variables_path <- file.path(
+  dir_output, "a_01", "sf_sld_variables_proj.rds"
+)
 if (!file.exists(chr_sld_variables_path)) {
   saveRDS(sf_sld_variables_proj, chr_sld_variables_path)
 }

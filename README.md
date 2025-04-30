@@ -10,7 +10,7 @@ Remake of the Community Severance Index for New Haven, Connecticut. Methodology 
 `a_01_preproc_smart_location_data.R`
 - Preparing spatial data sets from Smart Location Database.
 - Input(s): `data/input/SmartLocationDatabase.gbd`
-- Output(s): `data/output/a_01/sf_sld_variables.rds`, `data/output/a_01/df_sld.rds`
+- Output(s): `data/output/a_01/sf_sld_variables_proj.rds`, `data/output/a_01/df_sld.rds`
 
 `a_02_barrier_factor_prep.R`
 - Prepare barrier factor variables.
@@ -18,8 +18,8 @@ Remake of the Community Severance Index for New Haven, Connecticut. Methodology 
 - Output(s): 
 
 `a_03_prep_traffic.R`
-- Preparing traffic data from ESRI respoitories.
-- Output(s): `data/output/a_03/aadt_ct_2022.rds`, `data/output/a_03/traffic_counts.esri.rds`
+- Query US and Connecticut traffic data from ESRI respoitories.
+- Output(s): `data/output/a_03/sf_aadt_proj.rds`, `data/output/a_03/sf_ct_hpms_proj.rds`
 
 `a_04_traffic_count_esri_to_cbg.R`
 - Interpolate traffic intensity (counts) data to census block groups.

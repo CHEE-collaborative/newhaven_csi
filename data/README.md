@@ -22,14 +22,15 @@ unzip("USER_PATH/Downloads/newhaven_csi_data.zip", exdir = "USER_PATH/newhaven_c
 
 ## output/
 - a_01/
-  - `sf_sld_variables.rds`: SLD data filtered to 44 variables of interest. `sf`
+  - `sf_sld_variables_proj.rds`: SLD data filtered to 44 variables of interest and projected to Connecticut CRS. `sf`
   - `df_sld.rds`: SLD variable names, descriptions, and sources. `data.frame`
 
 - a_02/
 
 - a_03/
-  - `aadt_ct_2022.rds`: [BUG] See `a_03_prep_traffic.R` Line 30
-  - `traffic_counts_esri.rds`: Average Annual Daily Traffic (AADT) data from ESRI
+  - `sf_aadt_proj.rds`:  US Average Annual Daily Traffic (AADT) data from ESRI projected to Connecticut crs. `sf`
+      [BUG] See `a_03_prep_traffic.R` Line 30
+  - `sf_ct_hpms.rds`: Connecticut Highway Performance Monitoring System (HPMS) data projectedto Connecticut crs. `sf`
 
 - a_04/
   - `traffic_count_2_grid_sld_newhaven.rds`: Traffic intensity data (counts) interpolated to census block groups.
