@@ -1,7 +1,13 @@
 # newhaven_csi
-Remake of the Community Severance Index for New Haven based on the code by Benavides et al., 2024.
+Remake of the Community Severance Index for New Haven, Connecticut based on *Development of a community severance index for urban areas in the United States: A case study in New York City* (Benavides et al, 2024).
+Links: [journal article](https://www.sciencedirect.com/science/article/pii/S0160412024001120?ref=pdf_download&fr=RR-2&rr=9387bb57b9c37f56), [GitHub repository](https://github.com/jaime-benavides/community_severance_nyc?tab=readme-ov-file)
 
 ## scripts/
+`a_00_initiate.R`
+- Install and load required packages.
+- Set home and input/output directories and Connecticut-specific coordinate reference system.
+- Source at the beginning of each run script `source("scripts/a_00_initate.R")`
+
 `a_01_preproc_smart_location_data.R`
 - Preparing spatial data sets from Smart Location Database.
 - Input(s): `data/input/SmartLocationDatabase.gbd`
