@@ -1,7 +1,7 @@
 # newhaven_csi
 Remake of the Community Severance Index for New Haven, Connecticut. Methodology based on *Development of a community severance index for urban areas in the United States: A case study in New York City* (Benavides et al, 2024) ([journal article](https://www.sciencedirect.com/science/article/pii/S0160412024001120?ref=pdf_download&fr=RR-2&rr=9387bb57b9c37f56), [GitHub repository](https://github.com/jaime-benavides/community_severance_nyc?tab=readme-ov-file)).
 
-# Developments
+## Developments
 - 05/01/2025
   - Change spatial context from New Haven neighborhoods shapefile with `sf::st_union` to town boundary shapefile sourced from Connecticut DEEP ArcGIS archive (https://deepmaps.ct.gov/datasets/CTDEEP::connecticut-and-vicinity-town-boundary-set/about?layer=1).
   - When plotted, the unioned neighborhoods (red) have a different border than the town boundary (black), which would result in a different spatial context and different values for interpolation to census block groups and calculation of environmental variables.
@@ -30,11 +30,11 @@ Remake of the Community Severance Index for New Haven, Connecticut. Methodology 
 `a_04_regrid_aadt.R`
 - Regrid (interpolate) traffic intensity (counts) data to census block groups with local `regrid_ok()`.
 - Input(s): `data/output/a_01/sf_sld_variables_proj.rds`, `data/output/a_03/sf_aadt_proj.rds`, `R/regrid_ok.R`
-- Output(s): `data/output/a_04/sf_regrid_aadt_cbg.rds`
+- Output(s): `data/output/a_04/sf_grid_nh.rds`, `data/output/a_04/sf_regrid_aadt_cbg.rds`
 
 `a_05_regrid_hpms.R`
 - Regrid (interpolate) traffic intensity (segements) data to census block groups with local `regrid_ok()`
-- Input(s): `data/output/a_01/sf_sld_variables_proj.rds`, `data/output/a_03/sf_ct_hpms_proj.rds`, `R/regrid_ok.R`
+- Input(s): `data/output/a_04/sf_grid_nh.rds`, `data/output/a_03/sf_ct_hpms_proj.rds`, `R/regrid_ok.R`
 - Output(s): `data/output/a_05/sf_regrid_hpms_cbg.rds`
 
 `a_06_prep_osm_data.R`

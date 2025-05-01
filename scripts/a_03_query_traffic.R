@@ -1,5 +1,5 @@
 ################################################################################
-# Prepare traffic dataset from ESRI US Traffic Counts data.
+# Prepare traffic datasets (AADT and HPMS) from ESRI repositories.
 
 ################################################################################
 # Source variables from a_00_initiate.R

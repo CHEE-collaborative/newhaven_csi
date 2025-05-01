@@ -11,7 +11,7 @@ sf_nh_boundary <- generate_newhaven(path = chr_towns_path, crs = int_crs_ct)
 sf_context <- sf_nh_boundary
 
 ################################################################################
-# Import AADT data (generated in a_03_prep_traffic.R) and rename
+# Import AADT data (generated in a_03_prep_traffic.R).
 chr_aadt_path <- file.path(dir_output, "a_03", "traffic_counts_esri.rds")
 # chr_aadt_path <- file.path(dir_output, "a_03", "sf_aadt_proj.rds")
 testthat::expect_true(file.exists(chr_aadt_path))
@@ -42,7 +42,7 @@ sf_aadt_nh <- sf::st_intersection(sf_aadt_proj, sf_context)
 
 ################################################################################
 # Intersection to identify New Haven census block groups in SLD.
-sf_sld_nh <- sf::st_intersection(sf_sld_geoid, sf_context)
+sf_grid_nh <- sf::st_intersection(sf_sld_geoid, sf_context)
 ##### [BUG] Spatial intersection results in 105 censsu block groups, when
 #####       import from `tigris::block_groups()` reports 120 (see scratch.R)
 
@@ -52,7 +52,7 @@ sf_sld_nh <- sf::st_intersection(sf_sld_geoid, sf_context)
 source(file.path(dir_home, "R", "regrid_ok.R"))
 sf_regrid_aadt_cbg <- regrid_ok(
   non_uniform_data = sf::as_Spatial(sf_aadt_nh),
-  target_grid = sf::as_Spatial(sf_sld_nh),
+  target_grid = sf::as_Spatial(sf_grid_nh),
   crs_sim = int_crs_ct
 )
 colnames(sf_regrid_aadt_cbg)[1] <- "aadt"
@@ -60,9 +60,12 @@ sf_regrid_aadt_cbg$GEOID20 <- sf_regrid_aadt_cbg$GEOID20
 
 ################################################################################
 # Save output.
-sf_regrid_aadt_cbg_path <- file.path(
+chr_regrid_aadt_cbg <- file.path(
   dir_output, "a_04", "sf_regrid_aadt_cbg.rds"
 )
-if (!file.exists(sf_regrid_aadt_cbg_path)) {
-  saveRDS(sf_regrid_aadt_cbg, sf_regrid_aadt_cbg_path)
+if (!file.exists(chr_regrid_aadt_cbg)) {
+  saveRDS(sf_regrid_aadt_cbg, chr_regrid_aadt_cbg)
 }
+
+chr_sld_nh <- file.path(dir_output, "a_04", "sf_grid_nh.rds")
+if (!file.exists(chr_sld_nh)) saveRDS(sf_grid_nh, chr_sld_nh)

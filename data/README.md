@@ -35,7 +35,8 @@ unzip("USER_PATH/Downloads/newhaven_csi_data.zip", exdir = "USER_PATH/newhaven_c
   - `sf_ct_hpms.rds`: Connecticut Highway Performance Monitoring System (HPMS) data projectedto Connecticut crs. `sf`
 
 - a_04/
-  - `traffic_count_2_grid_sld_newhaven.rds`: Traffic intensity data (counts) interpolated to census block groups.
+  - `sf_grid_nh.rds`: New Haven census block group centroids projected to Connecticut crs. `sf`
+  - `sf_regrid_aadt_cbg.rds`: Traffic intensity data (counts) interpolated to census block groups. `sf`
 
 - a_05/
   - `traffic_segment_2_grid_sld_newhaven.rds`: Traffic intensity (segments) data interpolated to census block groups. [BUG] See `a_05_traffic_segment_hpms_to_cbg.R` for missing AADT data values during interpolation.
