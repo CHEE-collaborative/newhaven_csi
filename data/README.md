@@ -19,6 +19,8 @@ unzip("USER_PATH/Downloads/newhaven_csi_data.zip", exdir = "USER_PATH/newhaven_c
   - Geopackage containing [FILL] Connecticut data.
 - `DARTE_v2.gdb`
   - Geodatabase containing traffic CO2 emission data.
+- `CT_Vicinity_Town_Polygon`
+  - Folder containing shapefile (`.shp`) and supporting files for Connecticut and surrounding states' town boundaries.
 
 ## output/
 - a_01/

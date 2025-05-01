@@ -72,6 +72,7 @@ chr_varnames <- c(
   "NatWalkInd"
 )
 
+# nolint start
 chr_descriptions <- c(
   "Census block group 12-digit FIPS code (2018)",
   "State FIPS code", "County FIPS code",
@@ -116,6 +117,7 @@ chr_descriptions <- c(
   "Quantile ranked order (1,13-20) of [D4a] from lowest to highest",
   "Walkability Index"
 )
+# nolint end
 
 chr_sources <- c(
   "2019 Census TIGER/Line",
@@ -187,8 +189,15 @@ dim(sf_sld_variables)
 names(sf_sld_variables)
 
 ################################################################################
+# Subset to Connecticut data only
+sf_sld_variables_ct <- sf_sld_variables[
+  grep("09", sf_sld_variables$STATEFP),
+]
+dim(sf_sld_variables_ct)
+
+################################################################################
 # Project to Connecticut CRS.
-sf_sld_variables_proj <- sf::st_transform(sf_sld_variables, crs = int_crs_ct)
+sf_sld_variables_proj <- sf::st_transform(sf_sld_variables_ct, crs = int_crs_ct)
 
 ################################################################################
 # Save output.

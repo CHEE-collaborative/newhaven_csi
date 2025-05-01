@@ -10,6 +10,7 @@
 # dir_input - data input directory (character)
 # dir_output - data output directory (character)
 # int_crs_ct - Connecticut coordinate reference system code (integer)
+# chr_neighborhoods_path - Path to New Haven neighborhoods shapefile
 
 ################################################################################
 # Install and load runtime packages from CRAN.
