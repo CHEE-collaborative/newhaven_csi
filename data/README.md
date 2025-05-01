@@ -15,8 +15,12 @@ unzip("USER_PATH/Downloads/newhaven_csi_data.zip", exdir = "USER_PATH/newhaven_c
   - Folder containing shapefile (`.shp`) and supporting files for New Haven neighborhood boundaries data.
 - `nation`
   - Folder containing shapefile (`.shp`) and supporting files for United States boundaries data.
-- `connecticut-latest.gpkg`
-  - Geopackage containing [FILL] Connecticut data.
+- `geofabrik_connecticut-latest.gpkg`
+  - Geopackage (`.gpkg`) containing OpenStreetMap data.
+  - Generated in `a_06_prep_osm.R` script.
+- `geofabrik_connecticut-latest.osm.pbf`
+  - `osmextract` data query.
+  - Generated in `a_06_prep_osm.R` script.
 - `DARTE_v2.gdb`
   - Geodatabase containing traffic CO2 emission data.
 - `CT_Vicinity_Town_Polygon`
@@ -42,7 +46,7 @@ unzip("USER_PATH/Downloads/newhaven_csi_data.zip", exdir = "USER_PATH/newhaven_c
   - `traffic_segment_2_grid_sld_newhaven.rds`: Traffic intensity (segments) data interpolated to census block groups. [BUG] See `a_05_traffic_segment_hpms_to_cbg.R` for missing AADT data values during interpolation.
 
 - a_06/
-  - `osm_driving_network_northeast.rds`: OpenStreetMap driving network data for the Northeastern United Staes.
+  - `sf_osm_nh.rds`: OpenStreetMap driving network data for New Haven, projected to Connecticut crs. `sf`
 
 - a_07/
 

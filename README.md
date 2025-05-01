@@ -6,6 +6,7 @@ Remake of the Community Severance Index for New Haven, Connecticut. Methodology 
   - Change spatial context from New Haven neighborhoods shapefile with `sf::st_union` to town boundary shapefile sourced from Connecticut DEEP ArcGIS archive (https://deepmaps.ct.gov/datasets/CTDEEP::connecticut-and-vicinity-town-boundary-set/about?layer=1).
   - When plotted, the unioned neighborhoods (red) have a different border than the town boundary (black), which would result in a different spatial context and different values for interpolation to census block groups and calculation of environmental variables.
 ![New Haven boundary comparison](figures/nh_town_neighborhood_comparison.png)
+  - Direct query to OpenStreetMaps with post filtering instead of SQL filter at query time.
 
 ## scripts/
 `a_00_initiate.R`
@@ -37,10 +38,9 @@ Remake of the Community Severance Index for New Haven, Connecticut. Methodology 
 - Input(s): `data/output/a_04/sf_grid_nh.rds`, `data/output/a_03/sf_ct_hpms_proj.rds`, `R/regrid_ok.R`
 - Output(s): `data/output/a_05/sf_regrid_hpms_cbg.rds`
 
-`a_06_prep_osm_data.R`
+`a_06_prep_osm.R`
 - Prepare OpenStreetMaps data.
-- Input(s): `data/input/nation/cb_2018_us_nation_20m.shp`, `data/input/connecticut-latest.osm.pbf`
-- Output(s): `data/input/connecticut-latest.gpkg`, `data/output/a_06/osm_driving_network_northeast.rds`
+- Output(s): `data/input/geofabrik_connecticut-latest.osm.pbf`, `data/input/geofabrik_connecticut-latest.gpkg`, `data/output/a_06/sf_osm_nh_filter.rds`
 
 `a_07_road_infrastructure_dist_to_cbg.R`
 - Generate road infrastructure input data.
