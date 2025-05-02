@@ -49,6 +49,7 @@ unzip("USER_PATH/Downloads/newhaven_csi_data.zip", exdir = "USER_PATH/newhaven_c
   - `sf_osm_nh.rds`: OpenStreetMap driving network data for New Haven, projected to Connecticut crs. `sf`
 
 - a_07/
+  - `sf_grid_prox.rds`: Proximity to road type metrics calculated for census block groups and projected to Connecticut crs. `sf`
 
 - a_08/
   - `traffic_co2_emis_newhaven.rds`: Traffic CO2 emission data at census block groups.

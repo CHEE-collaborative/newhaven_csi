@@ -18,7 +18,7 @@
 source(file.path(here::here(), "scripts", "a_00_initiate.R"))
 
 ################################################################################
-# Generate New Haven boundary `sf` object.
+# Import New Haven boundary.
 sf_nh_boundary <- generate_newhaven(path = chr_towns_path, crs = int_crs_ct)
 sf_context <- sf_nh_boundary
 
@@ -30,7 +30,7 @@ sf_ct_hpms_proj <- readRDS(chr_ct_hpms_proj_path)
 sf_hpms_segments <- sf_ct_hpms_proj
 
 ################################################################################
-# Load grids.
+# Import grids
 chr_grid_nh <- file.path(dir_output, "a_04", "sf_grid_nh.rds")
 testthat::expect_true(file.exists(chr_grid_nh))
 sf_grid_nh <- readRDS(chr_grid_nh)

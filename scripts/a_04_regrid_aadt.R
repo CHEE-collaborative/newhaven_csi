@@ -6,7 +6,7 @@
 source(file.path(here::here(), "scripts", "a_00_initiate.R"))
 
 ################################################################################
-# Generate New Haven boundary `sf` object.
+# Import New Haven boundary.
 sf_nh_boundary <- generate_newhaven(path = chr_towns_path, crs = int_crs_ct)
 sf_context <- sf_nh_boundary
 

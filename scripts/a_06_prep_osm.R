@@ -13,14 +13,12 @@ chr_osm_network_tags <- c(
 )
 
 ################################################################################
-# Prepare New Haven boundary.
+# Import New Haven boundary.
 sf_nh_boundary <- generate_newhaven(chr_towns_path)
-sf_nh_bbox1 <- sf::st_as_sfc(sf::st_bbox(sf_nh_boundary))
+sf_nh_bbox <- sf::st_as_sfc(sf::st_bbox(sf_nh_boundary))
 
 ################################################################################
 # Get OpenStreetMap data with pre-defined options. Save in `data/input/`.
-# 4. Direct call to `oe_get` returns expected `$highways` values. Why was SQL
-#    based query used initially?
 chr_osm_gpkg_path <- file.path(dir_input, "geofabrik_connecticut-latest.gpkg")
 if (file.exists(chr_osm_gpkg_path)) {
   sf_osm_nh <- osmextract::oe_read(chr_osm_gpkg_path)
@@ -56,7 +54,7 @@ sf_osm_nh_filter <- sf_osm_nh[
       !sf_osm_nh$access %in% chr_filter_access
   ), !colnames(sf_osm_nh) %in% c("waterway", "aerialway", "man_made")
 ]
-head(sf_osm_nh_filter)
+testthat::expect_identical("EPSG:2234", sf::st_crs(sf_osm_nh_filter)$input)
 
 ################################################################################
 # Save output.

@@ -28,4 +28,10 @@ generate_newhaven <- function(path, crs = 2234) {
   ]
   return(sf_newhaven)
 }
+
+#' Apply min-max normalization.
+normalize <- function(x) {
+  xrange <- range(x, na.rm = TRUE)
+  return((x - xrange[1]) / (xrange[2] - xrange[1]))
+}
 # nolint end

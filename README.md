@@ -42,10 +42,10 @@ Remake of the Community Severance Index for New Haven, Connecticut. Methodology 
 - Prepare OpenStreetMaps data.
 - Output(s): `data/input/geofabrik_connecticut-latest.osm.pbf`, `data/input/geofabrik_connecticut-latest.gpkg`, `data/output/a_06/sf_osm_nh_filter.rds`
 
-`a_07_road_infrastructure_dist_to_cbg.R`
-- Generate road infrastructure input data.
-- Input(s):
-- Output(s):
+`a_07_calc_road.R`
+- Calculate road infrastructure statistics for census block groups.
+- Input(s): `data/output/a_04/sf_grid_nh.R`, `data/input/FAF5Network/F5F_NEWHAVEN.shp`, `data/output/a_06/sf_osm_nh_filter.rds`
+- Output(s): `data/output/a_07/sf_grid_prox.rds`
 
 `a_08_traffic_co2_emissions_to_cbg.R`
 - Prepare traffic CO2 emissions.
