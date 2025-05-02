@@ -52,4 +52,4 @@ unzip("USER_PATH/Downloads/newhaven_csi_data.zip", exdir = "USER_PATH/newhaven_c
   - `sf_grid_prox.rds`: Proximity to road type metrics calculated for census block groups and projected to Connecticut crs. `sf`
 
 - a_08/
-  - `traffic_co2_emis_newhaven.rds`: Traffic CO2 emission data at census block groups.
+  - `sf_co2_emis.rds`: Traffic CO2 emissions per m^2 calculated for census block groups and projected to Connecticut crs. `sf`

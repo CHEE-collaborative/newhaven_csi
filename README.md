@@ -47,7 +47,7 @@ Remake of the Community Severance Index for New Haven, Connecticut. Methodology 
 - Input(s): `data/output/a_04/sf_grid_nh.R`, `data/input/FAF5Network/F5F_NEWHAVEN.shp`, `data/output/a_06/sf_osm_nh_filter.rds`
 - Output(s): `data/output/a_07/sf_grid_prox.rds`
 
-`a_08_traffic_co2_emissions_to_cbg.R`
-- Prepare traffic CO2 emissions.
-- Input(s): `data/input/DARTE_v2.gdb`
-- Output(s): `data/output/a_08/traffic_co2_emis_newhaven.rds`
+`a_08_calc_emissions.R`
+- Calculate traffic CO2 emissions per m^2 for census block groups.
+- Input(s): `data/input/DARTE_v2.gdb`, `data/output/a_04/sf_grid_nh.rds`
+- Output(s): `data/output/a_08/sf_co2_emis.rds`
