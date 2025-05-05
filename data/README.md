@@ -25,6 +25,8 @@ unzip("USER_PATH/Downloads/newhaven_csi_data.zip", exdir = "USER_PATH/newhaven_c
   - Geodatabase containing traffic CO2 emission data.
 - `CT_Vicinity_Town_Polygon`
   - Folder containing shapefile (`.shp`) and supporting files for Connecticut and surrounding states' town boundaries.
+- `FAF5Network`
+  - Folder containing shapefile (`.shp`) and supporting files for Freight Analysis Framework 5.0 Model Network Database data.
 
 ## output/
 - a_01/
@@ -32,6 +34,7 @@ unzip("USER_PATH/Downloads/newhaven_csi_data.zip", exdir = "USER_PATH/newhaven_c
   - `df_sld.rds`: SLD variable names, descriptions, and sources. `data.frame`
 
 - a_02/
+  - `sf_barrier_factors_nh.rds`: Barrier factor indices for census block groups calculated with OpenStreetMap and Freight Analysis Framework 5.0 Model Network Database datasets. `sf`
 
 - a_03/
   - `sf_aadt_proj.rds`:  US Average Annual Daily Traffic (AADT) data from ESRI projected to Connecticut crs. `sf`

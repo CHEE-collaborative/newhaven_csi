@@ -19,10 +19,10 @@ Remake of the Community Severance Index for New Haven, Connecticut. Methodology 
 - Input(s): `data/input/SmartLocationDatabase.gbd`
 - Output(s): `data/output/a_01/sf_sld_variables_proj.rds`, `data/output/a_01/df_sld.rds`
 
-`a_02_barrier_factor_prep.R`
+`a_02_prep_barrier.R`
 - Prepare barrier factor variables.
 - Input(s): `data/input/connecticut-latest.osm.pbf`, `data/input/FAF5Network/F5FNEWHAVEN.shp`
-- Output(s): 
+- Output(s): `data/output/a_02/sf_barrier_factors_nh.rds`
 
 `a_03_query_traffic.R`
 - Query US (AADT) and Connecticut (HPMS) traffic data from ESRI respoitories.
