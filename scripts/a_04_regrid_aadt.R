@@ -43,13 +43,12 @@ sf_aadt_nh <- sf::st_intersection(sf_aadt_proj, sf_context)
 ################################################################################
 # Intersection to identify New Haven census block groups in SLD.
 sf_grid_nh <- sf::st_intersection(sf_sld_geoid, sf_context)
-##### [BUG] Spatial intersection results in 105 censsu block groups, when
+##### [BUG] Spatial intersection results in 105 census block groups, when
 #####       import from `tigris::block_groups()` reports 120 (see scratch.R)
 
 ################################################################################
 # Interpolate AADT values to census block groups.
 # From https://github.com/jaime-benavides/community_severance_nyc/blob/main/code/functions/functions.R
-source(file.path(dir_home, "R", "regrid_ok.R"))
 sf_regrid_aadt_cbg <- regrid_ok(
   non_uniform_data = sf::as_Spatial(sf_aadt_nh),
   target_grid = sf::as_Spatial(sf_grid_nh),

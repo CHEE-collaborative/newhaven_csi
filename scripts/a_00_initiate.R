@@ -45,9 +45,10 @@ for (r in seq_along(chr_remotes)) {
 }
 
 ################################################################################
-# Source helper functions.
+# Source functions.
 dir_home <- here::here()
 source(file.path(dir_home, "R", "helpers.R"))
+source(file.path(dir_home, "R", "regrid_ok.R"))
 
 ################################################################################
 # Set home, data, input, and output directories.
