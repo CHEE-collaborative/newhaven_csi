@@ -56,3 +56,15 @@ Remake of the Community Severance Index for New Haven, Connecticut. Methodology 
 - Merge all census block group-level variables into a single object.
 - Input(s): All `.rds` files generated in scripts `a_00` to `a_08`.
 - Output(s): `data/output/a_09/sf_csi_scale.rds`, `data/output/a_09/df_csi_geoid_scale.rds`
+
+`b_01_calc_csi.R`
+- Calculate Community Severance Index (CSI) for New Haven census block groups.
+- Input(s): `data/output/a_01/df_sld.rds`, `data/output/a_09/sf_csi_scale.rds`
+
+`c_01_plot_csi.R`
+- Plot CSI values for publication figures.
+
+### dep/
+- Deprecated `R` scripts which are not needed for analysis.
+- Sensitivity analyses are not required for our analysis as the sensitivity analyses conducted in the original Benavides et al, 2024 paper were conducted to support the 19 included variables.
+- Our analysis replicates the supported methodology and included variables and therefore does not need its own sensitivty supports.

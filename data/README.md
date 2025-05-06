@@ -27,6 +27,10 @@ unzip("USER_PATH/Downloads/newhaven_csi_data.zip", exdir = "USER_PATH/newhaven_c
   - Folder containing shapefile (`.shp`) and supporting files for Connecticut and surrounding states' town boundaries.
 - `FAF5Network`
   - Folder containing shapefile (`.shp`) and supporting files for Freight Analysis Framework 5.0 Model Network Database data.
+- `NH_Sidewalk`
+  - Folder containing shapefile (`.shp`) and supporting files for New Haven sidewalk data.
+- `Roadway_Designated_Urban_Area`
+  - Folder containing shapefile (`.shp`) and supporting files for New Haven roads as urban area data.
 
 ## output/
 - a_01/

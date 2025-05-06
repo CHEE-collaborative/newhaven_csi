@@ -1,55 +1,43 @@
-#c_01_estimate_community_sev_index_newhaven.R
+################################################################################
+# Calculate Community Severance Index (CSI) for New Haven.
 
-#Aline changed:
-#1. Nomenclature new york / nyc --> newhaven
-#2. New Haven shapefile
-#3. RRMC is actually lowercase rrmc
-#4. a couple tweaks to the line of code:
-#print_patterns_loc(dat[,c("MR1"), drop = FALSE],
-#                   colgroups = dat[,c("column_names", "family")],
-#                   pat_type = "factor",
-#                   n = p,
-#                   title = "FA factors",
-#                   size_line = 2,
-#                   size_point = 3.5)
+################################################################################
+# Aline changed:
+# 1. Nomenclature new york / nyc --> newhaven
+# 2. New Haven shapefile
+# 3. RRMC is actually lowercase rrmc
+# 4. a couple tweaks to the line of code:
+# print_patterns_loc(dat[,c("MR1"), drop = FALSE],
+#                    colgroups = dat[,c("column_names", "family")],
+#                    pat_type = "factor",
+#                    n = p,
+#                    title = "FA factors",
+#                    size_line = 2,
+#                    size_point = 3.5)
 
+################################################################################
+# Source variables from a_00_initiate.R
+source(file.path(here::here(), "scripts", "a_00_initiate.R"))
 
-# script aim: estimate community severance index for New Haven
-# First step to load packages etc.
-# 1a Declare root directory, folder locations and load essential stuff
-project.folder = paste0(print(here::here()),'/')
-source(paste0(project.folder,'init_directory_structure.R'))
-source(paste0(functions.folder,'script_initiate.R'))
+################################################################################
+# Missing Columbia-Primes/PCPHelpers R package.
+testthat::expect_true("PCPHelpers" %in% rownames(installed.packages()))
 
-#Trying to find the rrmc function because Columbia-PRIME won't run
-remotes::install_github("Columbia-PRIME/PCPhelpers")
-#Using GitHub PAT from the git credential store.
-#Error: Failed to install 'PCPhelpers' from GitHub:
-#  HTTP error 404.
-#Not Found
+################################################################################
+# Import CSI variable data.
+chr_desc_path <- file.path(dir_output, "a_01", "df_sld.rds")
+testthat::expect_true(file.exists(chr_desc_path))
+df_desc <- readRDS(chr_desc_path)
 
-#Did you spell the repo owner (`Columbia-PRIME`) and repo name (`PCPhelpers`) correctly?
-#  - If spelling is correct, check that you have the required permissions to access the repo.
-find.package("pcpr")
-#"/Library/Frameworks/R.framework/Versions/4.3-x86_64/Resources/library/pcpr"
-list.files(file.path(find.package("pcpr"), "R"), full.names = TRUE)
-library(pcpr)
-ls("package:pcpr")
+chr_csi_scale_path <- file.path(dir_output, "a_09", "sf_csi_scale.rds")
+testthat::expect_true(file.exists(chr_csi_scale_path))
+sf_csi_scale <- readRDS(chr_csi_scale_path)
 
-exists("RRMC")
-#fALSE
-exists("rrmc")
-#TRUE
-
-
-# set coordinate reference system
-crs <- 2163
-
-### load community severance input data
-data_desc <- readRDS(paste0(generated.data.folder, "smart_location_data_subset_desc.rds"))
-dta_cs_in <- readRDS(paste0(generated.data.folder, "community_severance_newhaven_input_data.rds"))
-
-built_social_block_newhaven_comm_sev_m <-  as.matrix(dta_cs_in[,-1])
+################################################################################
+# Transform sf_csi_scale to matrix.
+mat_csi_scale <- as.matrix(sf::st_drop_geometry(sf_csi_scale[,-1]))
+dim(mat_csi_scale)
+colnames(mat_csi_scale)
 
 
 sld_us_loc <- readRDS(paste0(generated.data.folder, "smart_location_data_subset.rds"))
