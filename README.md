@@ -51,3 +51,8 @@ Remake of the Community Severance Index for New Haven, Connecticut. Methodology 
 - Calculate traffic CO2 emissions per m^2 for census block groups.
 - Input(s): `data/input/DARTE_v2.gdb`, `data/output/a_04/sf_grid_nh.rds`
 - Output(s): `data/output/a_08/sf_co2_emis.rds`
+
+`a_09_merge.R`
+- Merge all census block group-level variables into a single object.
+- Input(s): All `.rds` files generated in scripts `a_00` to `a_08`.
+- Output(s): `data/output/a_09/sf_csi_scale.rds`, `data/output/a_09/df_csi_geoid_scale.rds`

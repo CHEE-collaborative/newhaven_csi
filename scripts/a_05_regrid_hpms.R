@@ -145,10 +145,11 @@ sf_regrid_hpms_cbg <- regrid_ok(
   target_grid = sf::as_Spatial(sf_grid_nh),
   crs_sim = int_crs_ct
 )
-
-# still got warnings, but i will mention it in my manuscript
-colnames(sf_regrid_hpms_cbg)[1] <- "aadt_hpms"
+colnames(sf_regrid_hpms_cbg)[1] <- "aadt_fhwa_segm"
 sf_regrid_hpms_cbg$GEOID20 <- sf_grid_nh$GEOID20
+sf_regrid_hpms_cbg <- sf_regrid_hpms_cbg[
+  , grep("var", names(sf_regrid_hpms_cbg), invert = TRUE)
+]
 
 ################################################################################
 # Save output.

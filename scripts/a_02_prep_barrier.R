@@ -213,6 +213,9 @@ sf_barrier_nh <- merge(
   merge(df_barrier_osm, df_barrier_faf5, by = "id_local"),
   by = "id_local"
 )
+sf_barrier_factors_nh <- sf_barrier_nh[
+  , c("GEOID20", "barrier_factor_osm", "barrier_factor_faf5")
+]
 
 ################################################################################
 # Save output.
@@ -220,7 +223,7 @@ chr_barrier_nh_path <- file.path(
   dir_output, "a_02", "sf_barrier_factors_nh.rds"
 )
 if (!file.exists(chr_barrier_nh_path)) {
-  saveRDS(sf_barrier_nh, chr_barrier_nh_path)
+  saveRDS(sf_barrier_factors_nh, chr_barrier_nh_path)
 }
 
 ################################################################################

@@ -46,7 +46,7 @@ unzip("USER_PATH/Downloads/newhaven_csi_data.zip", exdir = "USER_PATH/newhaven_c
   - `sf_regrid_aadt_cbg.rds`: Traffic intensity data (counts) interpolated to census block groups. `sf`
 
 - a_05/
-  - `traffic_segment_2_grid_sld_newhaven.rds`: Traffic intensity (segments) data interpolated to census block groups. [BUG] See `a_05_traffic_segment_hpms_to_cbg.R` for missing AADT data values during interpolation.
+  - `sf_regrid_hpms_cbg.rds.rds`: Traffic intensity (segments) data interpolated to census block groups. [BUG] See `a_05_traffic_segment_hpms_to_cbg.R` for missing AADT data values during interpolation.
 
 - a_06/
   - `sf_osm_nh.rds`: OpenStreetMap driving network data for New Haven, projected to Connecticut crs. `sf`
@@ -56,3 +56,7 @@ unzip("USER_PATH/Downloads/newhaven_csi_data.zip", exdir = "USER_PATH/newhaven_c
 
 - a_08/
   - `sf_co2_emis.rds`: Traffic CO2 emissions per m^2 calculated for census block groups and projected to Connecticut crs. `sf`
+
+- a_09/
+  - `sf_csi_scale.rds`: CSI variables at the census block group level for New Haven boundary, scaled according to standard deviation, with spatial geometries (`POINT`). `sf`
+  - `df_csi_geoid_scale.rds`: CSI variables at the census block group level for New Haven boundary, scaled according to standard deviation, without spatial geometries. `df`

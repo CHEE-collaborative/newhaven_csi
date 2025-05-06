@@ -54,8 +54,11 @@ sf_regrid_aadt_cbg <- regrid_ok(
   target_grid = sf::as_Spatial(sf_grid_nh),
   crs_sim = int_crs_ct
 )
-colnames(sf_regrid_aadt_cbg)[1] <- "aadt"
-sf_regrid_aadt_cbg$GEOID20 <- sf_regrid_aadt_cbg$GEOID20
+colnames(sf_regrid_aadt_cbg)[1] <- "aadt_esri_point"
+sf_regrid_aadt_cbg$GEOID20 <- sf_grid_nh$GEOID20
+sf_regrid_aadt_cbg <- sf_regrid_aadt_cbg[
+  , grep("var", names(sf_regrid_aadt_cbg), invert = TRUE)
+]
 
 ################################################################################
 # Save output.
