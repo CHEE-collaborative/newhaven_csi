@@ -73,12 +73,7 @@ df_csi_variables <- sf::st_drop_geometry(
 )
 # 1. Proper to scale by only standard deviation? Not a true standard scale or
 #    normalization.
-df_csi_scale <- data.frame(
-  sapply(
-    df_csi_variables,
-    function(x) (x / sd(x, na.rm = TRUE))
-  )
-)
+df_csi_scale <- data.frame(sapply(df_csi_variables, scale))
 sf_csi_scale <- cbind(sf_csi_geoid, df_csi_scale)
 df_csi_geoid_scale <- cbind(
   GEOID20 = sf_csi_geoid$GEOID20,
@@ -104,3 +99,6 @@ chr_csi_geoid_scale <- file.path(dir_output, "a_09", "df_csi_geoid_scale.rds")
 if (!file.exists(chr_csi_geoid_scale)) {
   saveRDS(df_csi_geoid_scale, chr_csi_geoid_scale)
 }
+
+chr_csi_raw_path <- file.path(dir_output, "a_09", "sf_csi_raw.rds")
+if (!file.exists(chr_csi_raw_path)) saveRDS(sf_csi, chr_csi_raw_path)

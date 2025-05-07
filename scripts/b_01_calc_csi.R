@@ -15,6 +15,10 @@ chr_csi_scale_path <- file.path(dir_output, "a_09", "sf_csi_scale.rds")
 testthat::expect_true(file.exists(chr_csi_scale_path))
 sf_csi_scale <- readRDS(chr_csi_scale_path)
 
+chr_csi_raw_path <- file.path(dir_output, "a_09", "sf_csi_raw.rds")
+testthat::expect_true(file.exists(chr_csi_raw_path))
+sf_csi_raw <- readRDS(chr_csi_raw_path)
+
 ################################################################################
 # Transform sf_csi_scale to matrix.
 mat_csi_scale <- as.matrix(sf::st_drop_geometry(sf_csi_scale[,-1]))
@@ -159,7 +163,7 @@ mat_csi_scale_reorder %>%
     method = c("pairwise.complete.obs", "pearson"),
     label = TRUE,
     label_size = 3,
-    label_alpha = T,
+    label_alpha = TRUE,
     hjust = 1,
     nbreaks = 10,
     limits = TRUE,
@@ -223,7 +227,7 @@ df_loadings <- dplyr::as_tibble(
   cbind(rownames(fa_csi$loadings[]), fa_csi$loadings[])
 )
 colnames(df_loadings)[1] <- "Variable"
-df_loadings %>%
+df_loadings <- df_loadings %>%
   dplyr::mutate_at(
     colnames(df_loadings)[grep("MR", colnames(df_loadings))], as.numeric
   )
@@ -237,7 +241,7 @@ df_loadings %>%
   kableExtra::kbl(caption = "Loadings") %>%
   kableExtra::kable_classic(
     full_width = FALSE, html_font = "Cambria", position = "center"
-  ) %>% 
+  ) %>%
   kableExtra::kable_styling(
     bootstrap_options = c("hover", "condensed"),
     fixed_thead = TRUE
@@ -251,6 +255,16 @@ df_scores <- dplyr::as_tibble(
 ) %>%
   dplyr::mutate_all(as.numeric)
 df_scores$max <- colnames(df_scores)[max.col(df_scores, ties.method = "first")]
+
+################################################################################
+# Calculate weighted index score based on 3 retained components and their
+# proportion of variance explained
+num_mr_weights <- fa_csi$Vaccounted["Proportion Var", ]
+df_scores$csi <- as.numeric(
+  as.matrix(df_scores[, c("MR1", "MR3", "MR2")]) %*% num_mr_weights
+)
+df_scores$csi_normal <- normalize(df_scores$csi)
+df_scores$csi_100 <- df_scores$csi_normal * 100
 
 ################################################################################
 # Table for scores.
@@ -271,7 +285,7 @@ df_pats <- df_loadings %>%
   dplyr::select(-max, -Variable) %>%
   dplyr::mutate_all(as.numeric)
 mat_pats <- as.matrix(df_pats)
-df_colgroups_pats <- cbind(colgroups_l, mat_pats)
+# df_colgroups_pats <- cbind(colgroups_l, mat_pats)
 
 ################################################################################
 # Plot loadings.
@@ -290,8 +304,11 @@ print_patterns_loc(
 
 ################################################################################
 # Merge CSI score with variable data.
-sf_csi_nh <- cbind(sf_csi_scale, df_scores)
-sf_csi_nh$MR1_norm <- normalize(df_csi$MR1)
+sf_csi_nh <- merge(
+  sf_csi_raw, sf::st_drop_geometry(sf_csi_scale), by = "GEOID20"
+)
+names(sf_csi_nh) <- gsub(".x", "_raw", gsub(".y", "_scale", names(sf_csi_nh)))
+sf_csi_nh <- cbind(sf_csi_nh, df_scores)
 
 ################################################################################
 # Save output.
