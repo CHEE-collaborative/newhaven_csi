@@ -60,6 +60,7 @@ Remake of the Community Severance Index for New Haven, Connecticut. Methodology 
 `b_01_calc_csi.R`
 - Calculate Community Severance Index (CSI) for New Haven census block groups.
 - Input(s): `data/output/a_01/df_sld.rds`, `data/output/a_09/sf_csi_scale.rds`
+- Output(s): `data/output/b_01/sf_csi_nh.rds`
 
 `c_01_plot_csi.R`
 - Plot CSI values for publication figures.

@@ -64,3 +64,6 @@ unzip("USER_PATH/Downloads/newhaven_csi_data.zip", exdir = "USER_PATH/newhaven_c
 - a_09/
   - `sf_csi_scale.rds`: CSI variables at the census block group level for New Haven boundary, scaled according to standard deviation, with spatial geometries (`POINT`). `sf`
   - `df_csi_geoid_scale.rds`: CSI variables at the census block group level for New Haven boundary, scaled according to standard deviation, without spatial geometries. `df`
+
+- b_01/
+  - `sf_csi_nh.rds`: CSI values and raw variables at the census block group level for New Haven boundary, with spatial geometries (`POINT`). `sf`

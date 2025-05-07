@@ -16,7 +16,8 @@
 # Install and load runtime packages from CRAN.
 chr_packages <- c(
   "dplyr", "sf", "testthat", "gstat", "tmap", "remotes", "here",
-  "osmextract", "spdep", "progressr", "tidyr", "vtable"
+  "osmextract", "spdep", "progressr", "tidyr", "vtable", "GGally",
+  "Matrix", "psych", "kableExtra"
 )
 
 install_if_missing <- function(package) {
