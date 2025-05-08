@@ -87,7 +87,7 @@ tmap_csi_faf5
 
 ################################################################################
 # Plot Community Severance Index with FAF5 roads (ggplot2).
-ggplot2::ggplot() +
+ggplot_csi_faf5 <- ggplot2::ggplot() +
   ggplot2::geom_sf(
     data = sf_context,
     fill = "black",
@@ -110,7 +110,14 @@ ggplot2::ggplot() +
   ggplot2::theme_bw()
 
 ################################################################################
-# Plot barrier data.
+# Save `ggplot_csi_faf5`.
+chr_csi_faf5_path <- file.path(dir_output, "c_01", "ggplot_csi_faf5.png")
+png(chr_csi_faf5_path)
+ggplot_csi_faf5
+dev.off()
+
+################################################################################
+# Plot barrier data (tmap).
 tmap_barrier_faf5 <- tmap::tm_shape(sf::st_make_valid(sf_context)) +
   tmap::tm_borders(lwd = 1, col = "black", fill_alpha = 0.1) +
   tmap::tm_shape(sf_csi_polygons) +
@@ -129,3 +136,38 @@ tmap_barrier_faf5 <- tmap::tm_shape(sf::st_make_valid(sf_context)) +
     lwd = 1,
     legend.col.show = TRUE
   )
+
+################################################################################
+# Plot barrier data with FAF5 roads (ggplot2).
+ggplot_barrier_faf5 <- ggplot2::ggplot() +
+  ggplot2::geom_sf(
+    data = sf_context,
+    fill = "black",
+    alpha = 0.1,
+    color = "black",
+    lwd = 1
+  ) +
+  ggplot2::geom_sf(
+    data = sf_csi_polygons,
+    aes(fill = barrier_factor_faf5_raw),
+    color = "black"
+  ) +
+  ggplot2::scale_fill_distiller(
+    palette = "Oranges", name = "Barrier Factor", direction = 1
+  ) +
+  ggplot2::geom_sf(data = sf_faf5_123_nh, aes(color = "Roadway"), lwd = 1) +
+  ggplot2::scale_color_manual(values = c("Roadway" = "black"), name = "") +
+  ggplot2::coord_sf(
+    xlim = sf::st_bbox(sf_csi_polygons)[c("xmin", "xmax")],
+    ylim = sf::st_bbox(sf_csi_polygons)[c("ymin", "ymax")]
+  ) +
+  ggplot2::theme_bw()
+
+################################################################################
+# Save `ggplot_csi_faf5`.
+chr_barrier_faf5_path <- file.path(
+  dir_output, "c_01", "ggplot_barrier_faf5.png"
+)
+png(chr_barrier_faf5_path)
+ggplot_barrier_faf5
+dev.off()
