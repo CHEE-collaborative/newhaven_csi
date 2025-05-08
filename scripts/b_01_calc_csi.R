@@ -272,7 +272,7 @@ df_scores %>%
   kableExtra::kbl(caption = "Scores") %>%
   kableExtra::kable_classic(
     full_width = FALSE, html_font = "Cambria", position = "center"
-  ) %>% 
+  ) %>%
   kableExtra::kable_styling(
     bootstrap_options = c("hover", "condensed"),
     fixed_thead = TRUE
@@ -304,13 +304,18 @@ print_patterns_loc(
 
 ################################################################################
 # Merge CSI score with variable data.
-sf_csi_nh <- merge(
+sf_csi_variables <- merge(
   sf_csi_raw, sf::st_drop_geometry(sf_csi_scale), by = "GEOID20"
 )
-names(sf_csi_nh) <- gsub(".x", "_raw", gsub(".y", "_scale", names(sf_csi_nh)))
-sf_csi_nh <- cbind(sf_csi_nh, df_scores)
+names(sf_csi_variables) <- gsub(
+  ".x", "_raw", gsub(".y", "_scale", names(sf_csi_variables))
+)
+sf_csi_nh <- cbind(
+  sf_csi_variables,
+  df_scores[, grep("MR\\d{1}|max", names(df_scores), invert = TRUE)]
+)
 
 ################################################################################
 # Save output.
-chr_df_csi_path <- file.path(dir_output, "b_01", "sf_csi_nh.rds")
-if (file.exists(chr_df_csi_path)) saveRDS(sf_csi_nh, chr_df_csi_path)
+chr_sf_csi_path <- file.path(dir_output, "b_01", "sf_csi_nh.rds")
+if (!file.exists(chr_sf_csi_path)) saveRDS(sf_csi_nh, chr_sf_csi_path)

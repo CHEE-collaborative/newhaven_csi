@@ -30,7 +30,7 @@ sf_ct_hpms_proj <- readRDS(chr_ct_hpms_proj_path)
 sf_hpms_segments <- sf_ct_hpms_proj
 
 ################################################################################
-# Import grids
+# Import grid.
 chr_grid_nh <- file.path(dir_output, "a_04", "sf_grid_nh.rds")
 testthat::expect_true(file.exists(chr_grid_nh))
 sf_grid_nh <- readRDS(chr_grid_nh)

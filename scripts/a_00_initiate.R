@@ -10,14 +10,14 @@
 # dir_input - data input directory (character)
 # dir_output - data output directory (character)
 # int_crs_ct - Connecticut coordinate reference system code (integer)
-# chr_neighborhoods_path - Path to New Haven neighborhoods shapefile
+# chr_towns_path - Path to New Haven town boundary shapefile.
 
 ################################################################################
 # Install and load runtime packages from CRAN.
 chr_packages <- c(
   "dplyr", "sf", "testthat", "gstat", "tmap", "remotes", "here",
   "osmextract", "spdep", "progressr", "tidyr", "vtable", "GGally",
-  "Matrix", "psych", "kableExtra"
+  "Matrix", "psych", "kableExtra", "sp", "terra", "raster"
 )
 
 install_if_missing <- function(package) {
@@ -31,11 +31,7 @@ invisible(lapply(chr_packages, install_if_missing))
 
 ################################################################################
 # Install GitHub packages.
-chr_remotes <- c(
-  "yonghah/esri2sf",
-  # "Columbia-PRIME/PCPhelpers",
-  "Columbia-PRIME/pcpr"
-)
+chr_remotes <- c("yonghah/esri2sf", "Columbia-PRIME/pcpr")
 
 for (r in seq_along(chr_remotes)) {
   chr_remote <- strsplit(chr_remotes[r], "/")[[1]][2]
