@@ -111,7 +111,7 @@ ggplot_csi_faf5 <- ggplot2::ggplot() +
 
 ################################################################################
 # Save `ggplot_csi_faf5`.
-chr_csi_faf5_path <- file.path(dir_output, "c_01", "ggplot_csi_faf5.png")
+chr_csi_faf5_path <- file.path("figures", "ggplot_csi_faf5.png")
 png(chr_csi_faf5_path)
 ggplot_csi_faf5
 dev.off()
@@ -165,9 +165,7 @@ ggplot_barrier_faf5 <- ggplot2::ggplot() +
 
 ################################################################################
 # Save `ggplot_csi_faf5`.
-chr_barrier_faf5_path <- file.path(
-  dir_output, "c_01", "ggplot_barrier_faf5.png"
-)
+chr_barrier_faf5_path <- file.path("figures", "ggplot_barrier_faf5.png")
 png(chr_barrier_faf5_path)
 ggplot_barrier_faf5
 dev.off()

@@ -2,6 +2,12 @@
 Remake of the Community Severance Index for New Haven, Connecticut. Methodology based on *Development of a community severance index for urban areas in the United States: A case study in New York City* (Benavides et al, 2024) ([journal article](https://www.sciencedirect.com/science/article/pii/S0160412024001120?ref=pdf_download&fr=RR-2&rr=9387bb57b9c37f56), [GitHub repository](https://github.com/jaime-benavides/community_severance_nyc?tab=readme-ov-file)).
 
 ## Developments
+- 05/08/2025
+  - Apply inverse weighted distance to fill `NA` values from Connecticut AADT dataset (`a_05_regrid_hpms.R`).
+  - Expand parameter grid to search for best fit PCP with wider range for rank values (`b_01_calc_csi.R`).
+  - Both changes resulted in 2 `RM`, accoutngin for 100% of variable variance.
+  - Upload CSI values (`data/github/sf_csi_nh.csv`) and plots (`figures/ggplot_*`).
+
 - 05/07/2025
   - Apply standard `scale` (mean = 0; sd = 1) to CSI variables.
     - Original scaled only based on `sd` of each variable and did not account for `mean`, which caused poor performance in the PCP dimensionality reduction.
@@ -146,10 +152,12 @@ Minimum correlation of possible factor scores     0.98 0.98 0.98
 `b_01_calc_csi.R`
 - Calculate Community Severance Index (CSI) for New Haven census block groups.
 - Input(s): `data/output/a_01/df_sld.rds`, `data/output/a_09/sf_csi_scale.rds`
-- Output(s): `data/output/b_01/sf_csi_nh.rds`
+- Output(s): `data/output/b_01/sf_csi_nh.rds`, `data/output/b_01/sf_csi_nh.csv`, `data/github/sf_csi_nh.csv`
 
 `c_01_plot_csi.R`
 - Plot CSI values for publication figures.
+- Input(s): `data/output/b_01/sf_csi_nh.rds`
+- Output(s): `figures/ggplot_csi_faf5.png`, `figures/ggplot_barrier_faf5.png`
 
 ### dep/
 - Deprecated `R` scripts which are not needed for analysis.

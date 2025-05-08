@@ -67,3 +67,5 @@ unzip("USER_PATH/Downloads/newhaven_csi_data.zip", exdir = "USER_PATH/newhaven_c
 
 - b_01/
   - `sf_csi_nh.rds`: CSI values and raw variables at the census block group level for New Haven boundary, with spatial geometries (`POINT`). `sf`
+  - `sf_csi_nh.csv`: CSI values and raw variables saved as tabular data (CSV) file.
+  
