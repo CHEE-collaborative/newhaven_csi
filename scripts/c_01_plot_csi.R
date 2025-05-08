@@ -64,7 +64,7 @@ testthat::expect_identical("EPSG:2234", sf::st_crs(sf_faf5_123_nh)$input)
 sf_faf5_123_nh$Roadway <- "Roadway"
 
 ################################################################################
-# Plot Community Severance Index with FAF5 roads.
+# Plot Community Severance Index with FAF5 roads (tmap).
 tmap_csi_faf5 <- tmap::tm_shape(sf::st_make_valid(sf_context)) +
   tmap::tm_borders(lwd = 1, fill = "black", fill_alpha = 0.1) +
   tmap::tm_shape(sf_csi_polygons) +
@@ -83,11 +83,31 @@ tmap_csi_faf5 <- tmap::tm_shape(sf::st_make_valid(sf_context)) +
     lwd = 1,
     legend.col.show = TRUE
   )
+tmap_csi_faf5
 
 ################################################################################
-# Save CSI x FAF5 map.
-chr_csi_faf5_path <- file.path(dir_output, "c_01", "tmap_csi_faf5.html")
-tmap::tmap_save(tmap_csi_faf5, chr_csi_faf5_path)
+# Plot Community Severance Index with FAF5 roads (ggplot2).
+ggplot2::ggplot() +
+  ggplot2::geom_sf(
+    data = sf_context,
+    fill = "black",
+    alpha = 0.1,
+    color = "black",
+    lwd = 1
+  ) +
+  ggplot2::geom_sf(
+    data = sf_csi_polygons, aes(fill = csi_normal), color = "black"
+  ) +
+  ggplot2::scale_fill_distiller(
+    palette = "Blues", name = "CSI", direction = 1
+  ) +
+  ggplot2::geom_sf(data = sf_faf5_123_nh, aes(color = "Roadway"), lwd = 1) +
+  ggplot2::scale_color_manual(values = c("Roadway" = "black"), name = "") +
+  ggplot2::coord_sf(
+    xlim = sf::st_bbox(sf_csi_polygons)[c("xmin", "xmax")],
+    ylim = sf::st_bbox(sf_csi_polygons)[c("ymin", "ymax")]
+  ) +
+  ggplot2::theme_bw()
 
 ################################################################################
 # Plot barrier data.
@@ -109,8 +129,3 @@ tmap_barrier_faf5 <- tmap::tm_shape(sf::st_make_valid(sf_context)) +
     lwd = 1,
     legend.col.show = TRUE
   )
-
-################################################################################
-# Save Barrier x FAF5 map.
-chr_barrier_faf5_path <- file.path(dir_output, "c_01", "tmap_barrier_faf5.html")
-tmap::tmap_save(tmap_barrier_faf5, chr_barrier_faf5_path)
