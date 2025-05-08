@@ -71,8 +71,6 @@ sf_csi_geoid <- sf_csi[, c("GEOID20")]
 df_csi_variables <- sf::st_drop_geometry(
   sf_csi[, grep("GEOID20", names(sf_csi), invert = TRUE)]
 )
-# 1. Proper to scale by only standard deviation? Not a true standard scale or
-#    normalization.
 df_csi_scale <- data.frame(sapply(df_csi_variables, scale))
 sf_csi_scale <- cbind(sf_csi_geoid, df_csi_scale)
 df_csi_geoid_scale <- cbind(

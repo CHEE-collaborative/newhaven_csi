@@ -3,17 +3,6 @@
 # block groups.
 
 ################################################################################
-################################################################################
-################################################################################
-# Due to the large range of AADT values in New Haven and gaps in data,
-# kriging produced unstable variogram fitting. While the interpolation provides
-# an estimate, values should be interpreted with caution, especially in areas
-# with sparse traffic data.
-################################################################################
-################################################################################
-################################################################################
-
-################################################################################
 # Source variables from a_00_initiate.R
 source(file.path(here::here(), "scripts", "a_00_initiate.R"))
 
@@ -43,105 +32,44 @@ sf_hpms_string_nh <- sf::st_cast(sf_hpms_segments_nh, "LINESTRING")
 ################################################################################
 # Select three points per line to represent the street segment in interpolation.
 int_npoints <- 3L
-sf_hpms_points_nh <- sf::st_line_sample(
+sf_hpms_sample_cast <- sf::st_line_sample(
   sf_hpms_string_nh, n = int_npoints, type = "regular"
 ) %>%
   sf::st_cast("POINT")
-sf_hpms_segments_points_nh <- sf::st_sf(
+sf_hpms_sample <- sf::st_sf(
   aadt = rep(sf_hpms_string_nh$aadt, each = int_npoints),
-  geom = sf_hpms_points_nh
+  geom = sf_hpms_sample_cast
 )
 
 ################################################################################
-# Kriging from mid point.
-# Aline adapted below -----------
-# adapted from Criado et al. (2022) https://earth.bsc.es/gitlab/es/universalkriging/-/blob/production/general/UK_mean.R
-# UK_mean_uniform_ok <- regrid_ok(
-#   non_uniform_data = sf::as_Spatial(sf_hpms_segments_points_nh),
-#   target_grid = sf::as_Spatial(sf_grid_nh),
-#   crs_sim = int_crs_ct
-# )
-# ALINE: To the line of code above, I got the error: Error in na.fail.default(list(aadt = c(88700L, 88700L, 88700L, 104100L, :
-# missing values in object - new york data is likely more complete than new haven data
+# Identify points with valid/missing `aadt` values.
+log_hpms_na <- is.na(sf_hpms_sample$aadt)
+
+sf_hpms_valid <- sf_hpms_sample[!log_hpms_na, ]
+testthat::expect_false(NA %in% sf_hpms_valid$aadt)
+
+sf_hpms_na <- sf_hpms_sample[log_hpms_na, ]
+testthat::expect_equal(unique(sf_hpms_na$aadt), as.integer(NA))
 
 ################################################################################
-# Identify points with missing values.
-sum(is.na(sf_hpms_segments_points_nh$aadt))
-int_aadt_na <- which(is.na(sf_hpms_segments_points_nh$aadt))
-
-################################################################################
-# 1. Why nearest neighbors to fill in NA values?
-# 2. Why 3, 5, ... etc as number of neighbors/
-# 3. Once interpolation with knn completed, why fill with mean?
-# 4. Difference between AADT from this dataset and previously calculated?
-# 5. What is meant by "new york has more stable constant traffic than
-#    New Haven"? Quantification? Not valid justification.
-
-################################################################################
-# Create nearest neighbors
-sf_hpms_segments_coords <- sf::st_coordinates(
-  sf::st_centroid(sf_hpms_segments_points_nh)
+# Inverse distance weighting (IDW) for NA value gap filling.
+gstat_idw_hpms <- gstat::gstat(
+  formula = aadt ~ 1,
+  data = sf_hpms_valid,
+  nmax = 15,
+  set = list(idp = 2)
 )
-knn_hmps <- spdep::knearneigh(sf_hpms_segments_coords, k = 3)
-# tried k = 3 and still had 1276 NAs
-# tried k = 5 and still has 568 NAs
-# tried k = 7 and still has 262 NAs
-
-################################################################################
-# Ensure connections across sub-groups
-nb_hpms <- spdep::knn2nb(knn_hmps, sym = TRUE)
-
-################################################################################
-# Function to assign missing values from nearest neighbors
-assign_aadt_from_neighbors <- function(index) {
-  neighbors <- nb_hpms[[index]]
-  neighbor_aadt <- sf_hpms_segments_points_nh$aadt[neighbors]
-  mean(neighbor_aadt, na.rm = TRUE)
-}
-
-################################################################################
-# Apply knn-mean to missing AADT values.
-sf_hpms_segments_points_nh$aadt[int_aadt_na] <- sapply(
-  int_aadt_na,
-  assign_aadt_from_neighbors
-)
-
-################################################################################
-# Recheck missing values.
-sum(is.na(sf_hpms_segments_points_nh$aadt))
-
-################################################################################
-# Fill in remaining NAs with dataset average AADT.
-sf_hpms_segments_points_nh$aadt[
-  is.na(sf_hpms_segments_points_nh$aadt)
-] <- mean(
-  sf_hpms_segments_points_nh$aadt,
-  na.rm = TRUE
-)
+sf_hpms_idw <- stats::predict(gstat_idw_hpms, sf_hpms_na)
+sf_hpms_sample$aadt[log_hpms_na] <- sf_hpms_idw$var1.pred
 
 ################################################################################
 # Ensure no missing values.
-testthat::expect_equal(sum(is.na(sf_hpms_segments_points_nh$aadt)), 0)
-
-################################################################################
-################################################################################
-# I got warnings saying: In fit.variogram(experimental_variogram,
-#model = vgm(psill = psill,  ... : value out of range in 'bessel_k'
-# this warning is likely due to new york having more stable constant
-# traffic while new haven has low to very high traffic
-summary(sf_hpms_segments_points_nh$aadt)
-# If you must use the kriging output, [include in manuscript]
-# Due to the large range of AADT values in New Haven and gaps in data,
-# kriging produced unstable variogram fitting. While the interpolation
-# provides an estimate, values should be interpreted with caution,
-# especially in areas with sparse traffic data.
-################################################################################
-################################################################################
+testthat::expect_equal(sum(is.na(sf_hpms_sample$aadt)), 0)
 
 ################################################################################
 # Interpolate HPMS values to census block groups.
 sf_regrid_hpms_cbg <- regrid_ok(
-  non_uniform_data = sf::as_Spatial(sf_hpms_segments_points_nh),
+  non_uniform_data = sf::as_Spatial(sf_hpms_sample),
   target_grid = sf::as_Spatial(sf_grid_nh),
   crs_sim = int_crs_ct
 )
