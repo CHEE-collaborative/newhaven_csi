@@ -57,7 +57,7 @@ df_var_namecat <- data.frame(
 ################################################################################
 # Define PCP parameters input.
 num_etas <- seq(0.01, 0.07, length.out = 11)
-int_rank <- 5L
+int_rank <- 2L:7L
 df_rrmc_grid <- expand.grid(eta = num_etas, r = int_rank)
 int_runs <- 22L
 num_perc_test <- 0.15
@@ -261,7 +261,7 @@ df_scores$max <- colnames(df_scores)[max.col(df_scores, ties.method = "first")]
 # proportion of variance explained
 num_mr_weights <- fa_csi$Vaccounted["Proportion Var", ]
 df_scores$csi <- as.numeric(
-  as.matrix(df_scores[, c("MR1", "MR3", "MR2")]) %*% num_mr_weights
+  as.matrix(df_scores[, grep("MR", names(df_scores))]) %*% num_mr_weights
 )
 df_scores$csi_normal <- normalize(df_scores$csi)
 df_scores$csi_100 <- df_scores$csi_normal * 100
