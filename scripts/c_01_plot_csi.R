@@ -17,6 +17,13 @@ sf_nh_boundary <- generate_newhaven(path = chr_towns_path, crs = int_crs_ct)
 sf_context <- sf_nh_boundary
 
 ################################################################################
+# Import Connecticut towns.
+sf_ct_towns <- sf::read_sf(chr_towns_path) %>%
+  sf::st_transform(crs = int_crs_ct) %>%
+  dplyr::filter(LAND_CLASS == "Land") %>%
+  dplyr::filter(STATE_NAME == "Connecticut")
+
+################################################################################
 # Import New Haven polygons.
 sf_ct_2019 <- tigris::block_groups(
   state = "CT", county = "New Haven", cb = TRUE, year = 2019
@@ -89,6 +96,9 @@ tmap_csi_faf5
 # Plot Community Severance Index with FAF5 roads (ggplot2).
 ggplot_csi_faf5 <- ggplot2::ggplot() +
   ggplot2::geom_sf(
+    data = sf_ct_towns, col = "grey50", fill = NA, lwd = 1
+  ) +
+  ggplot2::geom_sf(
     data = sf_context,
     fill = "black",
     alpha = 0.1,
@@ -103,15 +113,24 @@ ggplot_csi_faf5 <- ggplot2::ggplot() +
   ) +
   ggplot2::geom_sf(data = sf_faf5_123_nh, aes(color = "Roadway"), lwd = 1) +
   ggplot2::scale_color_manual(values = c("Roadway" = "black"), name = "") +
+  ggplot2::geom_sf(
+    data = sf_ct_towns, col = "grey50", fill = NA, lwd = 1
+  ) +
   ggplot2::coord_sf(
     xlim = sf::st_bbox(sf_csi_polygons)[c("xmin", "xmax")],
     ylim = sf::st_bbox(sf_csi_polygons)[c("ymin", "ymax")]
   ) +
   ggplot2::theme_bw()
+ggplot_csi_faf5
 
 ################################################################################
 # Save `ggplot_csi_faf5`.
-chr_csi_faf5_path <- file.path("figures", "ggplot_csi_faf5.png")
+chr_csi_faf5_path <- paste0(
+  "figures/",
+  "ggplot_csi_faf5_",
+  format(Sys.time(), "%m%d_%H%M"),
+  ".png"
+)
 png(chr_csi_faf5_path)
 ggplot_csi_faf5
 dev.off()
@@ -141,6 +160,9 @@ tmap_barrier_faf5 <- tmap::tm_shape(sf::st_make_valid(sf_context)) +
 # Plot barrier data with FAF5 roads (ggplot2).
 ggplot_barrier_faf5 <- ggplot2::ggplot() +
   ggplot2::geom_sf(
+    data = sf_ct_towns, col = "grey50", fill = NA, lwd = 1
+  ) +
+  ggplot2::geom_sf(
     data = sf_context,
     fill = "black",
     alpha = 0.1,
@@ -162,10 +184,16 @@ ggplot_barrier_faf5 <- ggplot2::ggplot() +
     ylim = sf::st_bbox(sf_csi_polygons)[c("ymin", "ymax")]
   ) +
   ggplot2::theme_bw()
+ggplot_barrier_faf5
 
 ################################################################################
 # Save `ggplot_csi_faf5`.
-chr_barrier_faf5_path <- file.path("figures", "ggplot_barrier_faf5.png")
+chr_barrier_faf5_path <- paste0(
+  "figures/",
+  "ggplot_barrier_faf5_",
+  format(Sys.time(), "%m%d_%H%M"),
+  ".png"
+)
 png(chr_barrier_faf5_path)
 ggplot_barrier_faf5
 dev.off()
