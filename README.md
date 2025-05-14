@@ -157,7 +157,32 @@ Minimum correlation of possible factor scores     0.98 0.98 0.98
 `c_01_plot_csi.R`
 - Plot CSI values for publication figures.
 - Input(s): `data/output/b_01/sf_csi_nh.rds`
-- Output(s): `figures/ggplot_csi_faf5.png`, `figures/ggplot_barrier_faf5.png`
+- Output(s): `data/output/c_01/sf_csi_polygons.rds`, `figures/ggplot_csi_faf5.png`, `figures/ggplot_barrier_faf5.png`
+
+`d_01_calc_tree.R`
+- Calculate tree cover statistics for census block groups.
+- Input(s): `data/input/greenness/tree_cover_New_Haven.tif`
+- Output(s): `data/output/d_01/sf_tree.rds`
+
+`d_02_calc_no2.R`
+- Calculate NO2 statistics for census block groups.
+- Input(s): `data/input/no2/HAQ_TROPOMI_NO2_CONUS_QA75_L3_Annual_[YYYY]_V2.4_[TIMESTAMP].nc4`
+- Output(s): `data/output/d_02/sf_no2.rds`
+
+`d_03_calc_pm25.R`
+- Calculate PM2.5 statistics for census block groups.
+
+`d_04_calc_temperature.R`
+- Calculate temperature statistics for census block groups.
+
+`d_05_query_demographic.R`
+- Query demographic data from United States census with `tidycensus` package.
+- Output(s): `data/output/d_05/sf_demographic_nh.rds`
+
+`d_06_merge.R`
+- Merge census block group-level CSI values with environmental conditions data.
+- Input(s): `data/output/d_01/...rds`
+- Output(s): `data/output/d_06/sf_csi_env_nh.rds`
 
 ### dep/
 - Deprecated `R` scripts which are not needed for analysis.

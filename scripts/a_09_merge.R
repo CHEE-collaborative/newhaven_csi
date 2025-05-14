@@ -60,10 +60,22 @@ sf_csi <- dplyr::left_join(
   dplyr::left_join(sf::st_drop_geometry(sf_co2_emis), by = "GEOID20")
 
 ################################################################################
+# Order CSI variables.
+chr_csi_order <- c(
+  "GEOID20", "interstate_highway_prox", "freeways_expressways_prox",
+  "other_princ_arter_prox", "tertiary_prox", "residential_prox",
+  "motorway_prox", "primary_prox", "secondary_prox", "trunk_prox",
+  "autom_netw_dens", "autom_inters_dens", "barrier_factor_osm",
+  "barrier_factor_faf5", "aadt_esri_point", "aadt_fhwa_segm",
+  "co2_emis_per_m2", "pedest_netw_dens", "street_no_autom_inters_dens",
+  "NatWalkInd"
+)
+sf_csi_order <- sf_csi[, chr_csi_order]
+
+################################################################################
 # CSI data descriptions.
-df_csi_summary <- vtable::sumtable(sf_csi, out = "return")
+df_csi_summary <- vtable::sumtable(sf_csi_order[, -1], out = "return")
 names(df_sld)[1] <- "Variable"
-# dplyr::left_join(df_sld, df_csi_summary, by = "Variable")
 
 ################################################################################
 # Scale CSI variables.
@@ -91,12 +103,13 @@ vtable::st(
 ################################################################################
 # Save output.
 chr_csi_scale <- file.path(dir_output, "a_09", "sf_csi_scale.rds")
-if (!file.exists(chr_csi_scale)) saveRDS(sf_csi_scale, chr_csi_scale)
+saveRDS(sf_csi_scale, chr_csi_scale)
 
 chr_csi_geoid_scale <- file.path(dir_output, "a_09", "df_csi_geoid_scale.rds")
-if (!file.exists(chr_csi_geoid_scale)) {
-  saveRDS(df_csi_geoid_scale, chr_csi_geoid_scale)
-}
+saveRDS(df_csi_geoid_scale, chr_csi_geoid_scale)
 
 chr_csi_raw_path <- file.path(dir_output, "a_09", "sf_csi_raw.rds")
-if (!file.exists(chr_csi_raw_path)) saveRDS(sf_csi, chr_csi_raw_path)
+saveRDS(sf_csi, chr_csi_raw_path)
+
+chr_csi_summary_path <- file.path(dir_output, "a_09", "df_csi_summary.csv")
+write.csv(df_csi_summary, chr_csi_summary_path)

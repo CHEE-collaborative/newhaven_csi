@@ -25,9 +25,11 @@ testthat::expect_true(file.exists(chr_grid_nh))
 sf_grid_nh <- readRDS(chr_grid_nh)
 
 ################################################################################
-# Intersection to identify New Haven roads for HPMS.
-sf_hpms_segments_nh <- sf::st_intersection(sf_hpms_segments, sf_context)
-sf_hpms_string_nh <- sf::st_cast(sf_hpms_segments_nh, "LINESTRING")
+# Intersection to identify New Haven roads for HPMS (2 mile buffer).
+sf_hpms_segments_nh_b <- sf::st_intersection(
+  sf_hpms_segments, sf::st_buffer(sf_context, 10560)
+)
+sf_hpms_string_nh <- sf::st_cast(sf_hpms_segments_nh_b, "LINESTRING")
 
 ################################################################################
 # Select three points per line to represent the street segment in interpolation.
@@ -82,6 +84,4 @@ sf_regrid_hpms_cbg <- sf_regrid_hpms_cbg[
 ################################################################################
 # Save output.
 chr_regrid_hpms_path <- file.path(dir_output, "a_05", "sf_regrid_hpms_cbg.rds")
-if (!file.exists(chr_regrid_hpms_path)) {
-  saveRDS(sf_regrid_hpms_cbg, chr_regrid_hpms_path)
-}
+saveRDS(sf_regrid_hpms_cbg, chr_regrid_hpms_path)

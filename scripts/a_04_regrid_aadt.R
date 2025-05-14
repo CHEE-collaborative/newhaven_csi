@@ -65,9 +65,7 @@ sf_regrid_aadt_cbg <- sf_regrid_aadt_cbg[
 chr_regrid_aadt_cbg <- file.path(
   dir_output, "a_04", "sf_regrid_aadt_cbg.rds"
 )
-if (!file.exists(chr_regrid_aadt_cbg)) {
-  saveRDS(sf_regrid_aadt_cbg, chr_regrid_aadt_cbg)
-}
+saveRDS(sf_regrid_aadt_cbg, chr_regrid_aadt_cbg)
 
 chr_sld_nh <- file.path(dir_output, "a_04", "sf_grid_nh.rds")
-if (!file.exists(chr_sld_nh)) saveRDS(sf_grid_nh, chr_sld_nh)
+saveRDS(sf_grid_nh, chr_sld_nh)

@@ -1,7 +1,5 @@
 ################################################################################
 # R settings, packages and reusable variables in the global environment.
-# Mitchell Manware
-# April 30, 2025
 
 ################################################################################
 # Generated variables
@@ -17,7 +15,8 @@
 chr_packages <- c(
   "dplyr", "sf", "testthat", "gstat", "tmap", "remotes", "here",
   "osmextract", "spdep", "progressr", "tidyr", "vtable", "GGally",
-  "Matrix", "psych", "kableExtra", "sp", "terra", "raster"
+  "Matrix", "psych", "kableExtra", "sp", "terra", "raster", "plotly",
+  "exactextractr", "tidycensus"
 )
 
 install_if_missing <- function(package) {

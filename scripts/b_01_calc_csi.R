@@ -85,23 +85,23 @@ list_rrmc_grid_result$summary_stats %>% dplyr::slice_min(rel_err)
 
 ################################################################################
 # Visualize grid search.
-# plot_ly(
-#   data = rrmc_results$summary_stats,
-#   x = ~eta,
-#   y = ~r,
-#   z = ~rel_err,
-#   type = "heatmap"
-# )
+plotly::plot_ly(
+  data = list_rrmc_grid_result$summary_stats,
+  x = ~eta,
+  y = ~r,
+  z = ~rel_err,
+  type = "heatmap"
+)
 
 ################################################################################
 # Visualize sparsity.
-# plot_ly(
-#   data = rrmc_results$summary_stats,
-#   x = ~eta,
-#   y = ~r,
-#   z = ~S_sparsity,
-#   type = "heatmap"
-# )
+plotly::plot_ly(
+  data = list_rrmc_grid_result$summary_stats,
+  x = ~eta,
+  y = ~r,
+  z = ~S_sparsity,
+  type = "heatmap"
+)
 
 ################################################################################
 # Extract best parameters according to minimum relative error.
@@ -318,10 +318,10 @@ sf_csi_nh <- cbind(
 ################################################################################
 # Save output.
 chr_sf_csi_path <- file.path(dir_output, "b_01", "sf_csi_nh.rds")
-if (!file.exists(chr_sf_csi_path)) saveRDS(sf_csi_nh, chr_sf_csi_path)
+saveRDS(sf_csi_nh, chr_sf_csi_path)
 
 chr_sf_csi_csv <- gsub(".rds", ".csv", chr_sf_csi_csv)
-if (!file.exists(chr_sf_csi_csv)) write.csv(sf_csi_nh, chr_sf_csi_csv)
+write.csv(sf_csi_nh, chr_sf_csi_csv)
 
 chr_sf_csi_github <- file.path(dir_data, "github", "sf_csi_nh.csv")
-if (!file.exists(chr_sf_csi_github)) write.csv(sf_csi_nh, chr_sf_csi_github)
+write.csv(sf_csi_nh, chr_sf_csi_github)

@@ -39,4 +39,4 @@ testthat::expect_identical("EPSG:2234", sf::st_crs(sf_co2_emis)$input)
 ################################################################################
 # Save output.
 chr_sf_co2_path <- file.path(dir_output, "a_08", "sf_co2_emis.rds")
-if (!file.exists(chr_sf_co2_path)) saveRDS(sf_co2_emis, chr_sf_co2_path)
+saveRDS(sf_co2_emis, chr_sf_co2_path)

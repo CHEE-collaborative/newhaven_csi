@@ -36,7 +36,7 @@ sf_ct_hpms_proj <- sf::st_transform(sf_ct_hpms, crs = int_crs_ct)
 ################################################################################
 # Save output.
 chr_aadt_path <- file.path(dir_output, "a_03", "sf_aadt_proj.rds")
-if (!file.exists(chr_aadt_path)) saveRDS(sf_aadt_proj, chr_aadt_path)
+saveRDS(sf_aadt_proj, chr_aadt_path)
 
 chr_ct_hpms_path <- file.path(dir_output, "a_03", "sf_ct_hpms_proj.rds")
-if (!file.exists(chr_ct_hpms_path)) saveRDS(sf_ct_hpms_proj, chr_ct_hpms_path)
+saveRDS(sf_ct_hpms_proj, chr_ct_hpms_path)

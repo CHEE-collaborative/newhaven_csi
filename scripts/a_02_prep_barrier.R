@@ -222,9 +222,7 @@ sf_barrier_factors_nh <- sf_barrier_nh[
 chr_barrier_nh_path <- file.path(
   dir_output, "a_02", "sf_barrier_factors_nh.rds"
 )
-if (!file.exists(chr_barrier_nh_path)) {
-  saveRDS(sf_barrier_factors_nh, chr_barrier_nh_path)
-}
+saveRDS(sf_barrier_factors_nh, chr_barrier_nh_path)
 
 ################################################################################
 # `tmap` settings.

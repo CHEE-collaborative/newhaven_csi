@@ -197,3 +197,11 @@ chr_barrier_faf5_path <- paste0(
 png(chr_barrier_faf5_path)
 ggplot_barrier_faf5
 dev.off()
+
+################################################################################
+# Save CSI polygons data.
+chr_sf_polygons_path <- file.path(dir_output, "c_01", "sf_csi_polygons.rds")
+saveRDS(sf_csi_polygons, chr_sf_polygons_path)
+
+chr_faf5_123_path <- file.path(dir_output, "c_01", "sf_faf5_123_nh.rds")
+saveRDS(sf_faf5_123_nh, chr_faf5_123_path)

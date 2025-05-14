@@ -59,4 +59,4 @@ testthat::expect_identical("EPSG:2234", sf::st_crs(sf_osm_nh_filter)$input)
 ################################################################################
 # Save output.
 chr_osm_nh_path <- file.path(dir_output, "a_06", "sf_osm_nh_filter.rds")
-if (!file.exists(chr_osm_nh_path)) saveRDS(sf_osm_nh_filter, chr_osm_nh_path)
+saveRDS(sf_osm_nh_filter, chr_osm_nh_path)

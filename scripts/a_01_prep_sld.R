@@ -201,13 +201,10 @@ sf_sld_variables_proj <- sf::st_transform(sf_sld_variables_ct, crs = int_crs_ct)
 chr_sld_variables_path <- file.path(
   dir_output, "a_01", "sf_sld_variables_proj.rds"
 )
-if (!file.exists(chr_sld_variables_path)) {
-  saveRDS(sf_sld_variables_proj, chr_sld_variables_path)
-}
+
+saveRDS(sf_sld_variables_proj, chr_sld_variables_path)
 testthat::expect_true(file.exists(chr_sld_variables_path))
 
 chr_sld_desc_path <- file.path(dir_output, "a_01", "df_sld.rds")
-if (!file.exists(chr_sld_desc_path)) {
-  saveRDS(df_sld, chr_sld_desc_path)
-}
+saveRDS(df_sld, chr_sld_desc_path)
 testthat::expect_true(file.exists(chr_sld_desc_path))

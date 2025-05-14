@@ -148,4 +148,4 @@ sf_grid_prox <- sf_grid_dist[
 ################################################################################
 # Save output.
 chr_grid_prox_path <- file.path(dir_output, "a_07", "sf_grid_prox.rds")
-if (!file.exists(chr_grid_prox_path)) saveRDS(sf_grid_prox, chr_grid_prox_path)
+saveRDS(sf_grid_prox, chr_grid_prox_path)

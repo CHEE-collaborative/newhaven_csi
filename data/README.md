@@ -69,3 +69,6 @@ unzip("USER_PATH/Downloads/newhaven_csi_data.zip", exdir = "USER_PATH/newhaven_c
   - `sf_csi_nh.rds`: CSI values and raw variables at the census block group level for New Haven boundary, with spatial geometries (`POINT`). `sf`
   - `sf_csi_nh.csv`: CSI values and raw variables saved as tabular data (CSV) file.
   
+- c_01/
+  - `sf_csi_polygons.rds`: CSI values, raw variables, and scaled variables at the census block group level for New Haven boundary, merged with polygon spatial geometries (`POLYGON`). `sf`
+  - `sf_faf5_123_nh.rds`: FAF5 values filtered to primary, secondary, and tertiary roads for New Haven town boundary. `sf`
