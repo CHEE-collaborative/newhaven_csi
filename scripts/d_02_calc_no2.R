@@ -37,13 +37,7 @@ sf_csi_polygons_proj <- sf::st_transform(
 )
 
 ################################################################################
-# Calculate 2019 and 5-year average NO2 values for census block groups.
-rast_no2$mean <- mean(rast_no2[[grep("20", names(rast_no2))]])
-sf_no2$no2_mean <- exactextractr::exact_extract(
-  rast_no2$mean,
-  sf_csi_polygons_proj,
-  fun = "mean"
-)
+# Calculate 2019 NO2 values for census block groups.
 sf_no2$no2_2019 <- exactextractr::exact_extract(
   rast_no2$Tropospheric_NO2_2019,
   sf_csi_polygons_proj,
@@ -78,37 +72,6 @@ testthat::expect_true(file.exists(chr_faf5_path))
 sf_faf5_123_nh <- readRDS(chr_faf5_path)
 
 ################################################################################
-# Plot mean NO2 values.
-ggplot_no2_mean_faf5 <- ggplot2::ggplot() +
-  ggplot2::geom_sf(
-    data = sf_ct_towns, col = "grey50", fill = NA, lwd = 1
-  ) +
-  ggplot2::geom_sf(
-    data = sf_context,
-    fill = "black",
-    alpha = 0.1,
-    color = "black",
-    lwd = 1
-  ) +
-  ggplot2::geom_sf(
-    data = sf_no2_proj, aes(fill = no2_mean), color = "black"
-  ) +
-  ggplot2::scale_fill_distiller(
-    palette = "YlGnBl", name = "NO2 Concentration (Mean 2019 - 2024)"
-  ) +
-  ggplot2::geom_sf(data = sf_faf5_123_nh, aes(color = "Roadway"), lwd = 1) +
-  ggplot2::scale_color_manual(values = c("Roadway" = "black"), name = "") +
-  ggplot2::geom_sf(
-    data = sf_ct_towns, col = "grey50", fill = NA, lwd = 1
-  ) +
-  ggplot2::coord_sf(
-    xlim = sf::st_bbox(sf_no2_proj)[c("xmin", "xmax")],
-    ylim = sf::st_bbox(sf_no2_proj)[c("ymin", "ymax")]
-  ) +
-  ggplot2::theme_bw()
-ggplot_no2_mean_faf5
-
-################################################################################
 # Plot 2019 NO2 values.
 ggplot_no2_2019_faf5 <- ggplot2::ggplot() +
   ggplot2::geom_sf(
@@ -125,8 +88,12 @@ ggplot_no2_2019_faf5 <- ggplot2::ggplot() +
     data = sf_no2_proj, aes(fill = no2_2019), color = "black"
   ) +
   ggplot2::scale_fill_distiller(
-    palette = "YlGnBl", name = "NO2 Concentration (2019)"
+    palette = "Purples", name = "NO2 Concentration (molec/cm^2)"
   ) +
+  # scale_fill_viridis_c(
+  #   option = "D",
+  #   name = expression(NO[2] ~ "Concentration (molec/" * cm^2 * ")")
+  # ) +
   ggplot2::geom_sf(data = sf_faf5_123_nh, aes(color = "Roadway"), lwd = 1) +
   ggplot2::scale_color_manual(values = c("Roadway" = "black"), name = "") +
   ggplot2::geom_sf(
@@ -137,4 +104,3 @@ ggplot_no2_2019_faf5 <- ggplot2::ggplot() +
     ylim = sf::st_bbox(sf_no2_proj)[c("ymin", "ymax")]
   ) +
   ggplot2::theme_bw()
-ggplot_no2_2019_faf5

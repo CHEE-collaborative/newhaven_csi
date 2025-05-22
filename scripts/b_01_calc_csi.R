@@ -81,6 +81,7 @@ list_rrmc_grid_result <- with_progress(
 ################################################################################
 # Inspect parameters results.
 list_rrmc_grid_result$summary_stats
+list_rrmc_grid_result$summary_stats$rel_err
 list_rrmc_grid_result$summary_stats %>% dplyr::slice_min(rel_err)
 
 ################################################################################
@@ -108,7 +109,9 @@ plotly::plot_ly(
 df_rrmc_opt <- list_rrmc_grid_result$summary_stats %>%
   dplyr::slice_min(rel_err)
 num_eta_opt <- df_rrmc_opt$eta
+testthat::expect_length(num_eta_opt, 1)
 num_r_opt <- df_rrmc_opt$r
+testthat::expect_length(num_r_opt, 1)
 
 ################################################################################
 # Run PCP with optimal parameters.
@@ -204,22 +207,8 @@ num_best_ebic <- which.min(num_ebic)
 ################################################################################
 # Extract factor analysis from list.
 fa_csi <- list_csi_fa[[num_best_ebic]]
+fa_csi$loadings
 fa_csi$loadings[]
-
-################################################################################
-# Organize factor analysis.
-data.frame("Factors" = num_factors, "EBIC" = num_ebic) %>%
-  kableExtra::kbl(caption = "Orthogonal Models: Fit Indices") %>%
-  kableExtra::kable_classic(
-    full_width = FALSE, html_font = "Cambria", position = "center"
-  ) %>%
-  kableExtra::kable_styling(
-    bootstrap_options = c("hover", "condensed"),
-    fixed_thead = TRUE
-  ) %>%
-  kableExtra::row_spec(
-    num_best_ebic, bold = TRUE, color = "white", background = "#D7261E"
-  )
 
 ################################################################################
 # Organize loadings.
@@ -234,19 +223,6 @@ df_loadings <- df_loadings %>%
 df_loadings$max <- colnames(df_loadings[, -1])[
   max.col(df_loadings[, -1], ties.method = "first")
 ]
-
-################################################################################
-# Table for loadings.
-df_loadings %>%
-  kableExtra::kbl(caption = "Loadings") %>%
-  kableExtra::kable_classic(
-    full_width = FALSE, html_font = "Cambria", position = "center"
-  ) %>%
-  kableExtra::kable_styling(
-    bootstrap_options = c("hover", "condensed"),
-    fixed_thead = TRUE
-  ) %>%
-  kableExtra::scroll_box(width = "100%", height = "400px")
 
 ################################################################################
 # Organize scores
@@ -265,19 +241,6 @@ df_scores$csi <- as.numeric(
 )
 df_scores$csi_normal <- normalize(df_scores$csi)
 df_scores$csi_100 <- df_scores$csi_normal * 100
-
-################################################################################
-# Table for scores.
-df_scores %>%
-  kableExtra::kbl(caption = "Scores") %>%
-  kableExtra::kable_classic(
-    full_width = FALSE, html_font = "Cambria", position = "center"
-  ) %>%
-  kableExtra::kable_styling(
-    bootstrap_options = c("hover", "condensed"),
-    fixed_thead = TRUE
-  ) %>%
-  kableExtra::scroll_box(width = "100%", height = "400px")
 
 ################################################################################
 # Prepare loadings.
@@ -320,7 +283,7 @@ sf_csi_nh <- cbind(
 chr_sf_csi_path <- file.path(dir_output, "b_01", "sf_csi_nh.rds")
 saveRDS(sf_csi_nh, chr_sf_csi_path)
 
-chr_sf_csi_csv <- gsub(".rds", ".csv", chr_sf_csi_csv)
+chr_sf_csi_csv <- gsub(".rds", ".csv", chr_sf_csi_path)
 write.csv(sf_csi_nh, chr_sf_csi_csv)
 
 chr_sf_csi_github <- file.path(dir_data, "github", "sf_csi_nh.csv")

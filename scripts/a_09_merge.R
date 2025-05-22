@@ -8,7 +8,9 @@ source(file.path(here::here(), "scripts", "a_00_initiate.R"))
 
 ################################################################################
 # List output files.
-chr_output_files <- list.files(dir_output, full.names = TRUE, recursive = TRUE)
+chr_output_files <- list.files(
+  dir_output, full.names = TRUE, recursive = TRUE, pattern = ".rds"
+)
 chr_output_files <- grep("a_\\d{2}", chr_output_files, value = TRUE)
 
 ################################################################################
@@ -88,16 +90,6 @@ sf_csi_scale <- cbind(sf_csi_geoid, df_csi_scale)
 df_csi_geoid_scale <- cbind(
   GEOID20 = sf_csi_geoid$GEOID20,
   df_csi_scale
-)
-
-################################################################################
-# Build data.frame for distributional characteristics (paper table).
-vtable::st(
-  df_csi_variables,
-  add.median = TRUE,
-  fit.page = "\\textwidth",
-  digits = 2,
-  out = "latex"
 )
 
 ################################################################################

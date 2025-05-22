@@ -41,13 +41,7 @@ sf_csi_polygons_proj <- sf::st_transform(
 )
 
 ################################################################################
-# Calculate 2019 and 5-year average pm25 values for census block groups.
-rast_pm25$mean <- mean(rast_pm25[[grep("GWRPM25", names(rast_pm25))]])
-sf_pm25$pm25_mean <- exactextractr::exact_extract(
-  rast_pm25$mean,
-  sf_csi_polygons_proj,
-  fun = "mean"
-)
+# Calculate 2019 pm25 values for census block groups.
 sf_pm25$pm25_2019 <- exactextractr::exact_extract(
   rast_pm25$GWRPM25_2019,
   sf_csi_polygons_proj,
@@ -82,37 +76,6 @@ testthat::expect_true(file.exists(chr_faf5_path))
 sf_faf5_123_nh <- readRDS(chr_faf5_path)
 
 ################################################################################
-# Plot mean PM2.5 values.
-ggplot_pm25_mean_faf5 <- ggplot2::ggplot() +
-  ggplot2::geom_sf(
-    data = sf_ct_towns, col = "grey50", fill = NA, lwd = 1
-  ) +
-  ggplot2::geom_sf(
-    data = sf_context,
-    fill = "black",
-    alpha = 0.1,
-    color = "black",
-    lwd = 1
-  ) +
-  ggplot2::geom_sf(
-    data = sf_pm25_proj, aes(fill = pm25_mean), color = "black"
-  ) +
-  ggplot2::scale_fill_distiller(
-    palette = "YlOrRd", name = "PM2.5 Concentration (Mean 2019 - 2024)"
-  ) +
-  ggplot2::geom_sf(data = sf_faf5_123_nh, aes(color = "Roadway"), lwd = 1) +
-  ggplot2::scale_color_manual(values = c("Roadway" = "black"), name = "") +
-  ggplot2::geom_sf(
-    data = sf_ct_towns, col = "grey50", fill = NA, lwd = 1
-  ) +
-  ggplot2::coord_sf(
-    xlim = sf::st_bbox(sf_pm25_proj)[c("xmin", "xmax")],
-    ylim = sf::st_bbox(sf_pm25_proj)[c("ymin", "ymax")]
-  ) +
-  ggplot2::theme_bw()
-ggplot_pm25_mean_faf5
-
-################################################################################
 # Plot 2019 PM2.5 values.
 ggplot_pm25_2019_faf5 <- ggplot2::ggplot() +
   ggplot2::geom_sf(
@@ -129,7 +92,7 @@ ggplot_pm25_2019_faf5 <- ggplot2::ggplot() +
     data = sf_pm25_proj, aes(fill = pm25_2019), color = "black"
   ) +
   ggplot2::scale_fill_distiller(
-    palette = "YlOrRd", name = "PM2.5 Concentration (2019)"
+    palette = "YlOrRd", name = "PM2.5 Concentration (µg/m^3) (2019)"
   ) +
   ggplot2::geom_sf(data = sf_faf5_123_nh, aes(color = "Roadway"), lwd = 1) +
   ggplot2::scale_color_manual(values = c("Roadway" = "black"), name = "") +

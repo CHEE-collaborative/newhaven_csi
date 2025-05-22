@@ -21,7 +21,8 @@ sf_nh_bbox <- sf::st_as_sfc(sf::st_bbox(sf_nh_boundary))
 # Get OpenStreetMap data with pre-defined options. Save in `data/input/`.
 chr_osm_gpkg_path <- file.path(dir_input, "geofabrik_connecticut-latest.gpkg")
 if (file.exists(chr_osm_gpkg_path)) {
-  sf_osm_nh <- osmextract::oe_read(chr_osm_gpkg_path)
+  sf_osm_nh <- osmextract::oe_read(chr_osm_gpkg_path) %>%
+    sf::st_transform(crs = int_crs_ct)
 } else {
   sf_osm_nh <- osmextract::oe_get(
     sf_nh_bbox,

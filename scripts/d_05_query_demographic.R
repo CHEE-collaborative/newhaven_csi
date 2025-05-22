@@ -12,33 +12,30 @@ testthat::expect_true(file.exists(chr_sf_csi_path))
 sf_csi_polygons <- readRDS(chr_sf_csi_path)
 
 ################################################################################
-# Set API key.
-tidycensus::census_api_key("YOUR_API_KEY", install = TRUE)
-
-################################################################################
 # Load variable list for 2019 ACS 5-year
 df_acs5_vars <- tidycensus::load_variables(2019, "acs5", cache = TRUE)
 
 ################################################################################
 # Demographic variables of interest.
 chr_demographic_vars <- c(
-  total = "B02001_001",
-  white = "B02001_002",
-  black = "B02001_003",
-  native = "B02001_004",
-  asian = "B02001_005",
-  pacific = "B02001_006",
-  other = "B02001_007",
-  multirace = "B02001_008"
+  total = "B03002_001",
+  white = "B03002_003",
+  black = "B03002_004",
+  native = "B03002_005",
+  asian = "B03002_006",
+  pacific = "B03002_007",
+  other = "B03002_008",
+  multirace = "B03002_009",
+  hispanic = "B03002_012"
 )
 testthat::expect_true(all(chr_demographic_vars %in% df_acs5_vars$name))
 
 ################################################################################
 # Query demographic variables for Connecticut census block groups.
-sf_demographic <- get_acs(
+sf_demographic <- tidycensus::get_acs(
   geography = "block group",
   state = "CT",
-  variables = demographic_vars,
+  variables = chr_demographic_vars,
   year = 2019,
   survey = "acs5",
   geometry = TRUE,
@@ -52,6 +49,13 @@ sf_demographic_nh <- sf_demographic[
   sf_demographic$GEOID %in% sf_csi_polygons$GEOID20,
   grep("NAME|M$", names(sf_demographic), invert = TRUE)
 ]
+sf_demographic_nh$nonwhiteE <-
+  sf_demographic_nh$totalE - sf_demographic_nh$white
+sf_demographic_nh$perc_white <-
+  sf_demographic_nh$whiteE / sf_demographic_nh$totalE * 100
+sf_demographic_nh$perc_nonwhite <-
+  sf_demographic_nh$nonwhiteE / sf_demographic_nh$totalE * 100
+names(sf_demographic_nh) <- gsub("GEOID", "GEOID20", names(sf_demographic_nh))
 
 ################################################################################
 # Save output.
