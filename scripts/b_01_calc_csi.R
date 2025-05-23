@@ -21,7 +21,7 @@ sf_csi_raw <- readRDS(chr_csi_raw_path)
 
 ################################################################################
 # Transform sf_csi_scale to matrix.
-mat_csi_scale <- as.matrix(sf::st_drop_geometry(sf_csi_scale[,-1]))
+mat_csi_scale <- as.matrix(sf::st_drop_geometry(sf_csi_scale[, -1]))
 dim(mat_csi_scale)
 colnames(mat_csi_scale)
 
@@ -56,10 +56,11 @@ df_var_namecat <- data.frame(
 
 ################################################################################
 # Define PCP parameters input.
-num_etas <- seq(0.01, 0.07, length.out = 11)
-int_rank <- 2L:7L
-df_rrmc_grid <- expand.grid(eta = num_etas, r = int_rank)
-int_runs <- 22L
+int_rank <- 5
+df_rrmc_grid <- data.frame(
+  eta = pcpr::get_pcp_defaults(mat_csi_scale)$eta * 10^seq(-1, 2, 1)
+)
+int_runs <- 25L
 num_perc_test <- 0.15
 num_lod <- rep(0, ncol(mat_csi_scale))
 
@@ -71,6 +72,7 @@ list_rrmc_grid_result <- with_progress(
       D = mat_csi_scale,
       pcp_fn = pcpr::rrmc,
       grid = df_rrmc_grid,
+      r = int_rank,
       perc_test = num_perc_test,
       num_runs = int_runs,
       parallel_strategy = "sequential"
@@ -127,7 +129,7 @@ sum(list_rrmc_opt$L < (-1 / 2)) / prod(dim(list_rrmc_opt$L))
 ################################################################################
 # Run factor analysis on low rank matrix.
 chr_lrm_names <- colnames(list_rrmc_opt$S)
-# data_desc <- data_desc[which(data_desc$var_name %in% chr_lrm_names), ]
+data_desc <- data_desc[which(data_desc$var_name %in% chr_lrm_names), ]
 
 ################################################################################
 # Reoder columns in low-rank (L) and sparsity (S) matricies.
@@ -248,22 +250,22 @@ df_pats <- df_loadings %>%
   dplyr::select(-max, -Variable) %>%
   dplyr::mutate_all(as.numeric)
 mat_pats <- as.matrix(df_pats)
-# df_colgroups_pats <- cbind(colgroups_l, mat_pats)
 
 ################################################################################
 # Plot loadings.
-chr_fa_plot_path <- file.path(dir_out, "b_01", "fa_patterns.png")
-# png(chr_fa_plot_path, 1250, 460)
+source("R/print_pattern_locs.R")
+chr_fa_plot_path <- file.path("figures", "fa_patterns.png")
+png(chr_fa_plot_path, 1250, 460)
 print_patterns_loc(
-  dat[, c("MR1"), drop = FALSE],
-  colgroups = dat[, c("column_names", "family")],
+  mat_pats[, grep("MR", colnames(mat_pats)), drop = FALSE],
+  colgroups = df_var_namecat[, c("variable", "category")],
   pat_type = "factor",
-  n = p,
+  n = ncol(mat_pats),
   title = "FA factors",
   size_line = 2,
   size_point = 3.5
 )
-# dev.off()
+dev.off()
 
 ################################################################################
 # Merge CSI score with variable data.
