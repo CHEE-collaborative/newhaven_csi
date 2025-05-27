@@ -13,7 +13,6 @@ sf_csi_cond <- readRDS(chr_csi_cond_path)
 
 ################################################################################
 # Analyze CSI x tree cover.
-plot(csi_100 ~ tree_cover_perc, data = sf_csi_cond)
 lm_tree <- lm(csi_100 ~ tree_cover_perc, data = sf_csi_cond)
 summary(lm_tree)
 confint(lm_tree)
@@ -29,6 +28,7 @@ ggplot_csi_tree <-
     y = "Community Severance Index (CSI) Score"
   ) +
   ggpubr::theme_pubr()
+ggplot_csi_tree
 
 chr_csi_tree <- paste0(
   "figures/",
@@ -42,7 +42,6 @@ dev.off()
 
 ################################################################################
 # Analyze CSI x NO2 concentration (2019)
-plot(csi_100 ~ no2_2019, data = sf_csi_cond)
 lm_no2 <- lm(csi_100 ~ no2_2019, data = sf_csi_cond)
 summary(lm_no2)
 confint(lm_no2)
@@ -54,10 +53,11 @@ ggplot_csi_no22019 <-
     method = "lm", se = TRUE, color = "purple", fill = "lightgrey"
   ) +
   ggplot2::labs(
-    x = "NO2 Concentration (NEED UNIT)",
+    x = "NO2 Concentration (molec/cm2)",
     y = "Community Severance Index (CSI) Score"
   ) +
   ggpubr::theme_pubr()
+ggplot_csi_no22019
 
 chr_csi_no22019 <- paste0(
   "figures/",
@@ -71,7 +71,6 @@ dev.off()
 
 ################################################################################
 # Analyze CSI x PM2.5 concentration (2019)
-plot(csi_100 ~ pm25_2019, data = sf_csi_cond)
 lm_pm25_2019 <- lm(csi_100 ~ pm25_2019, data = sf_csi_cond)
 summary(lm_pm25_2019)
 confint(lm_pm25_2019)
@@ -87,6 +86,7 @@ ggplot_csi_pm252019 <-
     y = "Community Severance Index (CSI) Score"
   ) +
   ggpubr::theme_pubr()
+ggplot_csi_pm252019
 
 chr_csi_pm252019 <- paste0(
   "figures/",
@@ -116,43 +116,107 @@ dev.off()
 #   ggpubr::theme_pubr()
 
 ################################################################################
-# Analyze CSI x % nonwite population (linear regression)
-plot(csi_100 ~ perc_nonwhite, data = sf_csi_cond)
-lm_perc_nonwhite <- lm(csi_100 ~ perc_nonwhite, data = sf_csi_cond)
-summary(lm_perc_nonwhite)
-confint(lm_perc_nonwhite)
+# Analyze CSI x % white population (linear regression)
+lm_perc_white <- lm(csi_100 ~ perc_white, data = sf_csi_cond)
+summary(lm_perc_white)
+confint(lm_perc_white)
 
-ggplot_csi_nonwhite <-
-  ggplot2::ggplot(sf_csi_cond, aes(x = perc_nonwhite, y = csi_100)) +
+ggplot_csi_white <-
+  ggplot2::ggplot(sf_csi_cond, aes(x = perc_white, y = csi_100)) +
   ggplot2::geom_point(alpha = 0.6) +
   ggplot2::geom_smooth(
     method = "lm", se = TRUE, color = "blue", fill = "lightgrey"
   ) +
   ggplot2::labs(
-    x = "Non-White Population (%)",
+    x = "Non-Hispanic White Population (%)",
     y = "Community Severance Index (CSI) Score"
   ) +
   ggpubr::theme_pubr()
+ggplot_csi_white
 
-chr_csi_nonwhite <- paste0(
+chr_csi_white <- paste0(
   "figures/",
-  "ggplot_csi_nonwhite_",
+  "ggplot_csi_white_",
   format(Sys.time(), "%m%d_%H%M"),
   ".png"
 )
-png(chr_csi_nonwhite)
-ggplot_csi_nonwhite
+png(chr_csi_white)
+ggplot_csi_white
 dev.off()
 
 ################################################################################
-# Analyze CSI x minority/nonminority dominant (t.test)
-sf_csi_cond$pred_minority <- ifelse(
-  sf_csi_cond$perc_nonwhite > sf_csi_cond$perc_white,
-  "Predominantly Non-White",
-  "Predominantly White"
+# Analyze CSI x % black population (linear regression)
+lm_perc_black <- lm(csi_100 ~ perc_black, data = sf_csi_cond)
+summary(lm_perc_black)
+confint(lm_perc_black)
+
+ggplot_csi_black <-
+  ggplot2::ggplot(sf_csi_cond, aes(x = perc_black, y = csi_100)) +
+  ggplot2::geom_point(alpha = 0.6) +
+  ggplot2::geom_smooth(
+    method = "lm", se = TRUE, color = "blue", fill = "lightgrey"
+  ) +
+  ggplot2::labs(
+    x = "Non-Hispanic Black Population (%)",
+    y = "Community Severance Index (CSI) Score"
+  ) +
+  ggpubr::theme_pubr()
+ggplot_csi_black
+
+chr_csi_black <- paste0(
+  "figures/",
+  "ggplot_csi_black_",
+  format(Sys.time(), "%m%d_%H%M"),
+  ".png"
 )
-boxplot(csi_100 ~ pred_minority, data = sf_csi_cond)
-t.test(csi_100 ~ pred_minority, data = sf_csi_cond)
+png(chr_csi_black)
+ggplot_csi_black
+dev.off()
+
+################################################################################
+# Analyze CSI x % hispanic population (linear regression)
+lm_perc_hispanic <- lm(csi_100 ~ perc_hispanic, data = sf_csi_cond)
+summary(lm_perc_hispanic)
+confint(lm_perc_hispanic)
+
+ggplot_csi_hispanic <-
+  ggplot2::ggplot(sf_csi_cond, aes(x = perc_hispanic, y = csi_100)) +
+  ggplot2::geom_point(alpha = 0.6) +
+  ggplot2::geom_smooth(
+    method = "lm", se = TRUE, color = "blue", fill = "lightgrey"
+  ) +
+  ggplot2::labs(
+    x = "Hispanic Population (%)",
+    y = "Community Severance Index (CSI) Score"
+  ) +
+  ggpubr::theme_pubr()
+ggplot_csi_hispanic
+
+chr_csi_hispanic <- paste0(
+  "figures/",
+  "ggplot_csi_hispanic_",
+  format(Sys.time(), "%m%d_%H%M"),
+  ".png"
+)
+png(chr_csi_hispanic)
+ggplot_csi_hispanic
+dev.off()
+
+################################################################################
+# Analyze CSI x predominant population (anova)
+chr_pred <- c()
+for (r in seq_len(nrow(sf_csi_cond))) {
+  sf_csi_r <- sf::st_drop_geometry(
+    sf_csi_cond[r, grep("perc_", names(sf_csi_cond))]
+  )
+  chr_max <- names(sf_csi_r)[which.max(sf_csi_r[1, ])]
+  chr_pred <- c(chr_pred, gsub("perc_", "", chr_max))
+}
+sf_csi_cond$pred <- chr_pred
+
+lm_pred <- lm(csi_100 ~ pred_minority, data = sf_csi_cond)
+summary(lm_pred)
+anova(lm_pred)
 
 ggplot_csi_box <- ggplot2::ggplot(
   sf_csi_cond,
@@ -168,10 +232,11 @@ ggplot_csi_box <- ggplot2::ggplot(
     y = "Community Severance Index (CSI) Score"
   ) +
   ggplot2::scale_fill_manual(
-    values = c("#60886d", "#906c9e")
+    values = c("#60886d", "#906c9e", "#545da0")
   ) +
   ggpubr::theme_pubr() +
   ggplot2::theme(legend.position = "none")
+ggplot_csi_box
 
 chr_csi_box <- paste0(
   "figures/",

@@ -71,28 +71,6 @@ testthat::expect_identical("EPSG:2234", sf::st_crs(sf_faf5_123_nh)$input)
 sf_faf5_123_nh$Roadway <- "Roadway"
 
 ################################################################################
-# Plot Community Severance Index with FAF5 roads (tmap).
-tmap_csi_faf5 <- tmap::tm_shape(sf::st_make_valid(sf_context)) +
-  tmap::tm_borders(lwd = 1, fill = "black", fill_alpha = 0.1) +
-  tmap::tm_shape(sf_csi_polygons) +
-  tmap::tm_polygons(
-    col = "csi_normal",
-    palette = "brewer.blues",
-    title = "CSI",
-    border.col = "black"
-  ) +
-  tmap::tm_shape(sf_faf5_123_nh) +
-  tmap::tm_lines(
-    col = "Roadway",
-    palette = "black",
-    title.col = "",
-    col.alpha = 1,
-    lwd = 1,
-    legend.col.show = TRUE
-  )
-tmap_csi_faf5
-
-################################################################################
 # Plot Community Severance Index with FAF5 roads (ggplot2).
 ggplot_csi_faf5 <- ggplot2::ggplot() +
   ggplot2::geom_sf(
@@ -134,27 +112,6 @@ chr_csi_faf5_path <- paste0(
 png(chr_csi_faf5_path)
 ggplot_csi_faf5
 dev.off()
-
-################################################################################
-# Plot barrier data (tmap).
-tmap_barrier_faf5 <- tmap::tm_shape(sf::st_make_valid(sf_context)) +
-  tmap::tm_borders(lwd = 1, col = "black", fill_alpha = 0.1) +
-  tmap::tm_shape(sf_csi_polygons) +
-  tmap::tm_polygons(
-    col = "barrier_factor_faf5_raw",
-    palette = "brewer.oranges",
-    title = "Barrier Factor",
-    border.col = "black"
-  ) +
-  tmap::tm_shape(sf_faf5_123_nh) +
-  tmap::tm_lines(
-    col = "Roadway",
-    palette = "black",
-    title.col = "",
-    col.alpha = 1,
-    lwd = 1,
-    legend.col.show = TRUE
-  )
 
 ################################################################################
 # Plot barrier data with FAF5 roads (ggplot2).

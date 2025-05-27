@@ -49,12 +49,12 @@ sf_demographic_nh <- sf_demographic[
   sf_demographic$GEOID %in% sf_csi_polygons$GEOID20,
   grep("NAME|M$", names(sf_demographic), invert = TRUE)
 ]
-sf_demographic_nh$nonwhiteE <-
-  sf_demographic_nh$totalE - sf_demographic_nh$white
 sf_demographic_nh$perc_white <-
   sf_demographic_nh$whiteE / sf_demographic_nh$totalE * 100
-sf_demographic_nh$perc_nonwhite <-
-  sf_demographic_nh$nonwhiteE / sf_demographic_nh$totalE * 100
+sf_demographic_nh$perc_black <-
+  sf_demographic_nh$blackE / sf_demographic_nh$totalE * 100
+sf_demographic_nh$perc_hispanic <-
+  sf_demographic_nh$hispanicE / sf_demographic_nh$totalE * 100
 names(sf_demographic_nh) <- gsub("GEOID", "GEOID20", names(sf_demographic_nh))
 
 ################################################################################

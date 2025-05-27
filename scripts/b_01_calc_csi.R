@@ -87,26 +87,6 @@ list_rrmc_grid_result$summary_stats$rel_err
 list_rrmc_grid_result$summary_stats %>% dplyr::slice_min(rel_err)
 
 ################################################################################
-# Visualize grid search.
-plotly::plot_ly(
-  data = list_rrmc_grid_result$summary_stats,
-  x = ~eta,
-  y = ~r,
-  z = ~rel_err,
-  type = "heatmap"
-)
-
-################################################################################
-# Visualize sparsity.
-plotly::plot_ly(
-  data = list_rrmc_grid_result$summary_stats,
-  x = ~eta,
-  y = ~r,
-  z = ~S_sparsity,
-  type = "heatmap"
-)
-
-################################################################################
 # Extract best parameters according to minimum relative error.
 df_rrmc_opt <- list_rrmc_grid_result$summary_stats %>%
   dplyr::slice_min(rel_err)
@@ -139,7 +119,7 @@ list_rrmc_opt$S <- list_rrmc_opt$S[, chr_varnames]
 
 ################################################################################
 # Plot low rank matrix correlations.
-chr_lrm_plot_path <- file.path(dir_output, "b_01", "plot_lrm_pc.png")
+chr_lrm_plot_path <- file.path("figures", "plot_lrm_pc.png")
 # png(chr_lrm_plot_path, 900, 460)
 list_rrmc_opt$L %>%
   GGally::ggcorr(
@@ -255,7 +235,7 @@ mat_pats <- as.matrix(df_pats)
 # Plot loadings.
 source("R/print_pattern_locs.R")
 chr_fa_plot_path <- file.path("figures", "fa_patterns.png")
-png(chr_fa_plot_path, 1250, 460)
+# png(chr_fa_plot_path, 1250, 460)
 print_patterns_loc(
   mat_pats[, grep("MR", colnames(mat_pats)), drop = FALSE],
   colgroups = df_var_namecat[, c("variable", "category")],
@@ -265,7 +245,7 @@ print_patterns_loc(
   size_line = 2,
   size_point = 3.5
 )
-dev.off()
+# dev.off()
 
 ################################################################################
 # Merge CSI score with variable data.
