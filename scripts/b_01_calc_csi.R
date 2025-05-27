@@ -235,7 +235,7 @@ mat_pats <- as.matrix(df_pats)
 # Plot loadings.
 source("R/print_pattern_locs.R")
 chr_fa_plot_path <- file.path("figures", "fa_patterns.png")
-# png(chr_fa_plot_path, 1250, 460)
+png(chr_fa_plot_path, 1250, 460)
 print_patterns_loc(
   mat_pats[, grep("MR", colnames(mat_pats)), drop = FALSE],
   colgroups = df_var_namecat[, c("variable", "category")],
@@ -245,7 +245,7 @@ print_patterns_loc(
   size_line = 2,
   size_point = 3.5
 )
-# dev.off()
+dev.off()
 
 ################################################################################
 # Merge CSI score with variable data.
