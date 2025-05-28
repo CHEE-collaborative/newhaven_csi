@@ -109,7 +109,7 @@ cooling_degree_days <- function(
     terra::longnames(rast_hi) <- "heat index"
 
     # Binary indicator for cooling degree day (> `threshold`).
-    rast_cdd <- (rast_hi > 65) * 1
+    rast_cdd <- (rast_hi > threshold) * 1
     terra::varnames(rast_cdd) <- "cooling degree day (binary)"
     names(rast_cdd) <- paste0("cdd_", gsub("-", "", terra::time(rast_cdd)))
 
