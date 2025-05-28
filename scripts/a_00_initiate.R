@@ -13,10 +13,40 @@
 ################################################################################
 # Install and load runtime packages from CRAN.
 chr_packages <- c(
-  "dplyr", "sf", "testthat", "gstat", "tmap", "remotes", "here",
-  "osmextract", "spdep", "progressr", "tidyr", "vtable", "GGally",
-  "Matrix", "psych", "kableExtra", "sp", "terra", "raster", "plotly",
-  "exactextractr", "tidycensus"
+  "dplyr",
+  "sf",
+  "testthat",
+  "gstat",
+  "tmap",
+  "remotes",
+  "here",
+  "osmextract",
+  "spdep",
+  "progressr",
+  "tidyr",
+  "vtable",
+  "GGally",
+  "Matrix",
+  "psych",
+  "kableExtra",
+  "sp",
+  "terra",
+  "raster",
+  "plotly",
+  "exactextractr",
+  "tidycensus",
+  "lme4",
+  "lqmm",
+  "tidyverse",
+  "tigris",
+  "daymetr",
+  "ncdf4",
+  "readxl",
+  "rnaturalearth",
+  "geodata",
+  "purrr",
+  "zoo",
+  "patchwork"
 )
 
 install_if_missing <- function(package) {
