@@ -5,6 +5,7 @@
 # Source variables from a_00_initiate.R
 source(file.path(here::here(), "scripts", "a_00_initiate.R"))
 source(file.path(here::here(), "R", "tejm_analysis.R"))
+source(file.path(here::here(), "R", "cooling_days.R"))
 
 ################################################################################
 # Import CSI polygons data.
@@ -18,13 +19,12 @@ dir_daymet <- file.path(dir_input, "daymet")
 testthat::expect_true(dir.exists(dir_daymet))
 
 ################################################################################
-# create data folder if it doesn't already exist
+# Create `tmax` and `vp` data folders if they dont't already exist.
 if (!dir.exists(file.path(dir_daymet, "tmax"))) {
   dir.create(file.path(dir_daymet, "tmax"))
 }
 testthat::expect_true(dir.exists(file.path(dir_daymet, "tmax")))
 
-# create a HICDD folder if it doesnt exist already
 if (!dir.exists(file.path(dir_daymet, "vp"))) {
   dir.create(file.path(dir_daymet, "vp"))
 }
@@ -35,29 +35,22 @@ testthat::expect_true(dir.exists(file.path(dir_daymet, "vp")))
 DownloadDaymetData(
   years = 2019,
   # location = c(-72.99777, 41.24645, -72.86083, 41.35038)
-  location = c(41.24645, -72.99777,  41.35038, -72.86083)
+  location = c(41.24645, -72.99777, 41.35038, -72.86083)
 )
 
-
-list_ghpym <- GetHicddsPerYear_monthly(
-  year = 2019, census_data = sf_csi_polygons
+################################################################################
+# Calculate cooling degree days.
+source(file.path(here::here(), "R", "cooling_days.R"))
+df_cdd <- cooling_degree_days(
+  years = 2019,
+  tmax_path = file.path(dir_input, "daymet", "tmax"),
+  vp_path = file.path(dir_input, "daymet", "vp"),
+  threshold = 65,
+  locs = sf::st_centroid(sf_csi_polygons),
+  locs_id = "GEOID20",
+  summarize = TRUE
 )
-names(list_ghpym[[1]])
 
-days_in_season <- list_ghpym[[1]]$days_in_season
-tmax_array_cooling_season_F <- list_ghpym[[2]]$tmax_array_cooling_season_F
-relative_humidity <- list_ghpym[[3]]$relative_humidity
-
-
-names(list_ghpym)
-
-
-heat_index <- sapply(
-  1:days_in_season,
-  function(j) {
-    GetHeatIndex(
-      t = tmax_array_cooling_season_F[,, j],
-      rh = relative_humidity[,, j]
-    )
-  }
-)
+head(df_cdd)
+summary(df_cdd)
+str(df_cdd)

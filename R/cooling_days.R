@@ -10,6 +10,8 @@
 #' or polygons. Polygons will be used to calculate weighted mean.
 #' @param locs_id chr(1). Column with unique identifier for each location
 #' (e.g. "GEOID" or "GEOID20").
+#' @param summarize logical(1). Summarize values according to location? (e.g.
+#' total CDD per location).
 #' @importFrom terra rast values longnames units varnames lapp nlyr crs time
 #' @importFrom exactextractr exact_extract
 #' @importFrom sf st_transform
@@ -20,7 +22,8 @@ cooling_degree_days <- function(
   vp_path,
   threshold = 65,
   locs,
-  locs_id
+  locs_id,
+  summarize = FALSE
 ) {
   # Check inputs.
   stopifnot(!is.null(years))
@@ -31,7 +34,7 @@ cooling_degree_days <- function(
   stopifnot(is.numeric(years))
 
   # Set empty data.frame for storing output.
-  df_cdd <- data.frame()
+  df_hi <- data.frame()
 
   # Iterate for each year.
   for (y in seq_along(years)) {
@@ -108,24 +111,19 @@ cooling_degree_days <- function(
     terra::varnames(rast_hi) <- "heat index"
     terra::longnames(rast_hi) <- "heat index"
 
-    # Binary indicator for cooling degree day (> `threshold`).
-    rast_cdd <- (rast_hi > threshold) * 1
-    terra::varnames(rast_cdd) <- "cooling degree day (binary)"
-    names(rast_cdd) <- paste0("cdd_", gsub("-", "", terra::time(rast_cdd)))
-
     # Extract cooling degree day indicator for locations.
-    for (c in seq_len(terra::nlyr(rast_cdd))) {
+    for (h in seq_len(terra::nlyr(rast_hi))) {
       if ("POLYGON" %in% as.character(unique(sf::st_geometry_type(locs)))) {
-        num_cdd <- exactextractr::exact_extract(
-          rast_cdd[[c]],
+        num_hi <- exactextractr::exact_extract(
+          rast_hi[[h]],
           locs,
           weights = "area",
           fun = "sum",
           progress = FALSE
         )
       } else {
-        num_cdd <- terra::extract(
-          rast_cdd[[c]],
+        num_hi <- terra::extract(
+          rast_hi[[h]],
           terra::vect(locs),
           method = "simple",
           ID = FALSE,
@@ -135,25 +133,40 @@ cooling_degree_days <- function(
       }
 
       # Merge with location ID and time values.
-      df_cdd_c <- data.frame(
-        locs_id = locs[[locs_id]],
-        time = as.Date(
-          gsub("cdd_", "", names(rast_cdd[[c]])),
-          format = "%Y%m%d"
-        ),
-        CDD = num_cdd
+      df_hi_h <- data.frame(
+        id = locs[[locs_id]],
+        time = terra::time(rast_hi[[h]]),
+        hi = num_hi
       )
-      names(df_cdd_c) <- c(locs_id, "time", "CDD")
+      names(df_hi_h) <- c(locs_id, "time", "HeatIndex")
 
       # Merge with other years' data.
-      df_cdd <- rbind(df_cdd, df_cdd_c)
+      df_hi <- rbind(df_hi, df_hi_h)
     }
   }
-  return(df_cdd)
+
+  # Calculate degrees above threshold and cooling degree day binary values.
+  df_hi$AboveThreshold <- CalcTempAboveThresh(
+    df_hi$HeatIndex,
+    threshold = threshold
+  )
+  df_hi$CDD <- ifelse(df_hi$AboveThreshold > 0, 1, 0)
+
+  if (summarize) {
+    # Calculate total degrees above threshold for each location.
+    df_at <- aggregate(AboveThreshold ~ get(locs_id), data = df_hi, FUN = sum)
+    # Calculate number of days above threshold for each location.
+    df_cdd <- aggregate(CDD ~ get(locs_id), data = df_hi, FUN = sum)
+    df_summarize <- merge(df_at, df_cdd, by = "get(locs_id)")
+    names(df_summarize) <- c(locs_id, "CDD", "CDD_binary")
+    return(df_summarize)
+  } else {
+    return(df_hi)
+  }
 }
 
 ################################################################################
-#' Function to calculate saturated vapor pressure.
+#' Calculate saturated vapor pressure.
 GetSatVP <- function(t) {
   ifelse(
     t > 0,
@@ -163,7 +176,7 @@ GetSatVP <- function(t) {
 }
 
 ################################################################################
-#' Function for converting celcius to farenheit.
+#' Convert Celcius to farenheit.
 C_to_F <- function(T.celsius, round = 2) {
   T.fahrenheit <- (9 / 5) * T.celsius + 32
   T.fahrenheit <- round(T.fahrenheit, digits = round)
@@ -221,4 +234,10 @@ GetHeatIndex <- function(t = NA, rh = NA) {
       )
     )
   )
+}
+
+################################################################################
+#' Calculate heat index above threshold.
+CalcTempAboveThresh <- function(temperature, threshold = 65) {
+  pmax(temperature, threshold) - threshold
 }
