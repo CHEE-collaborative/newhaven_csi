@@ -114,17 +114,19 @@ cooling_degree_days <- function(
     # Extract cooling degree day indicator for locations.
     for (h in seq_len(terra::nlyr(rast_hi))) {
       if ("POLYGON" %in% as.character(unique(sf::st_geometry_type(locs)))) {
+        locs_p <- sf::st_transform(locs, terra::crs(rast_hi))
         num_hi <- exactextractr::exact_extract(
           rast_hi[[h]],
-          locs,
+          locs_p,
           weights = "area",
-          fun = "sum",
+          fun = "mean",
           progress = FALSE
         )
       } else {
+        locs_p <- terra::project(locs, terra::crs(rast_hi))
         num_hi <- terra::extract(
           rast_hi[[h]],
-          terra::vect(locs),
+          locs_p,
           method = "simple",
           ID = FALSE,
           bind = FALSE,

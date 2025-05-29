@@ -46,11 +46,8 @@ df_cdd <- cooling_degree_days(
   tmax_path = file.path(dir_input, "daymet", "tmax"),
   vp_path = file.path(dir_input, "daymet", "vp"),
   threshold = 65,
-  locs = sf::st_centroid(sf_csi_polygons),
+  locs = sf_csi_polygons,
   locs_id = "GEOID20",
   summarize = TRUE
 )
-
-head(df_cdd)
-summary(df_cdd)
-str(df_cdd)
+df_cdd
