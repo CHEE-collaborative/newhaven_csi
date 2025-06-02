@@ -68,10 +68,13 @@ testthat::expect_true(file.exists(chr_faf5_path))
 sf_faf5_123_nh <- readRDS(chr_faf5_path)
 
 ################################################################################
-# Plot mean NO2 values.
+# Plot tree cover percentage values.
 ggplot_tree_faf5 <- ggplot2::ggplot() +
   ggplot2::geom_sf(
-    data = sf_ct_towns, col = "grey50", fill = NA, lwd = 1
+    data = sf_ct_towns,
+    col = "grey50",
+    fill = NA,
+    lwd = 1
   ) +
   ggplot2::geom_sf(
     data = sf_context,
@@ -81,7 +84,9 @@ ggplot_tree_faf5 <- ggplot2::ggplot() +
     lwd = 1
   ) +
   ggplot2::geom_sf(
-    data = sf_tree, aes(fill = tree_cover_perc), color = "black"
+    data = sf_tree,
+    aes(fill = tree_cover_perc),
+    color = "black"
   ) +
   ggplot2::scale_fill_distiller(
     palette = "Greens",
@@ -91,7 +96,10 @@ ggplot_tree_faf5 <- ggplot2::ggplot() +
   ggplot2::geom_sf(data = sf_faf5_123_nh, aes(color = "Roadway"), lwd = 1) +
   ggplot2::scale_color_manual(values = c("Roadway" = "black"), name = "") +
   ggplot2::geom_sf(
-    data = sf_ct_towns, col = "grey50", fill = NA, lwd = 1
+    data = sf_ct_towns,
+    col = "grey50",
+    fill = NA,
+    lwd = 1
   ) +
   ggplot2::coord_sf(
     xlim = sf::st_bbox(sf_tree)[c("xmin", "xmax")],

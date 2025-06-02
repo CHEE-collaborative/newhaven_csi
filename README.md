@@ -166,14 +166,18 @@ Minimum correlation of possible factor scores     0.98 0.98 0.98
 
 `d_02_calc_no2.R`
 - Calculate NO2 statistics for census block groups.
-- Input(s): `data/input/no2/HAQ_TROPOMI_NO2_CONUS_QA75_L3_Annual_[YYYY]_V2.4_[TIMESTAMP].nc4`
+- Input(s): `data/input/no2/HAQ_TROPOMI_NO2_CONUS_QA75_L3_Annual_2019_V2.4_20240729.nc4`
 - Output(s): `data/output/d_02/sf_no2.rds`
 
 `d_03_calc_pm25.R`
 - Calculate PM2.5 statistics for census block groups.
+- Input(s): `data/input/pm2.5/V5GL0502.HybridPM25.NorthAmerica.201901-201912.nc`
+- Output(s): `data/d_03/sf_pm25_proj.rds`
 
 `d_04_calc_temperature.R`
-- Calculate temperature statistics for census block groups.
+- Calculate Cooling Degree Day statistics for census block groups.
+- Input(s): `data/daymet/tmax/daymet_v4_daily_na_tmax_2019.nc`, `data/daymet/vp/daymet_v4_daily_na_vp_2019.nc`
+- Output(s): `data/output/d_04/sf_cdd.rds`
 
 `d_05_query_demographic.R`
 - Query demographic data from United States census with `tidycensus` package.
@@ -182,7 +186,19 @@ Minimum correlation of possible factor scores     0.98 0.98 0.98
 `d_06_merge.R`
 - Merge census block group-level CSI values with environmental conditions data.
 - Input(s): `data/output/d_01/...rds`
-- Output(s): `data/output/d_06/sf_csi_env_nh.rds`
+- Output(s): `data/output/d_06/sf_csi_cond.rds`
+
+`e_01_simple.R`
+- Analyze relationships between CSI and environmental/demographic conditions with simple linear regression methods.
+- Input(s): `data/output/d_06/sf_csi_cond.rds`
+
+`e_02_simple_yj.R`
+- Analyze relationships between Yeo-Johnson transformed CSI and environmental conditions with simple linear regression methods.
+- Input(s): `data/output/d_06/sf_csi_cond.rds`
+
+`e_03_mgvc.R`
+- Explore `mgvc` models for CSI and environmental/demographic conditions.
+- Input(s): `data/output/d_06/sf_csi_cond.rds`
 
 ### dep/
 - Deprecated `R` scripts which are not needed for analysis.

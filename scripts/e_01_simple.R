@@ -1,5 +1,6 @@
 ################################################################################
-# Analyze Community Severance Index and environmental/demographic conditions.
+# Analyze Community Severance Index and environmental/demographic conditions
+# with vanilla linear regression methods.
 
 ################################################################################
 # Source variables from a_00_initiate.R
@@ -17,11 +18,23 @@ lm_tree <- lm(csi_100 ~ tree_cover_perc, data = sf_csi_cond)
 summary(lm_tree)
 confint(lm_tree)
 
+# Test for normally distributed residuals.
+shapiro.test(lm_tree$residuals)
+
+# Visualize
+hist(lm_tree$residuals)
+qqnorm(lm_tree$residuals)
+qqline(lm_tree$residuals, col = "Forestgreen")
+
+# Plot
 ggplot_csi_tree <-
   ggplot2::ggplot(sf_csi_cond, aes(x = tree_cover_perc, y = csi_100)) +
   ggplot2::geom_point(alpha = 0.6) +
   ggplot2::geom_smooth(
-    method = "lm", se = TRUE, color = "forestgreen", fill = "lightgrey"
+    method = "lm",
+    se = TRUE,
+    color = "forestgreen",
+    fill = "lightgrey"
   ) +
   ggplot2::labs(
     x = "Tree Cover (%)",
@@ -46,11 +59,23 @@ lm_no2 <- lm(csi_100 ~ no2_2019, data = sf_csi_cond)
 summary(lm_no2)
 confint(lm_no2)
 
+# Test for normally distributed residuals.
+shapiro.test(lm_no2$residuals)
+
+# Visualize
+hist(lm_no2$residuals)
+qqnorm(lm_no2$residuals)
+qqline(lm_no2$residuals, col = "purple")
+
+# Plot
 ggplot_csi_no22019 <-
   ggplot2::ggplot(sf_csi_cond, aes(x = no2_2019, y = csi_100)) +
   ggplot2::geom_point(alpha = 0.6) +
   ggplot2::geom_smooth(
-    method = "lm", se = TRUE, color = "purple", fill = "lightgrey"
+    method = "lm",
+    se = TRUE,
+    color = "purple",
+    fill = "lightgrey"
   ) +
   ggplot2::labs(
     x = "NO2 Concentration (molec/cm2)",
@@ -71,15 +96,27 @@ dev.off()
 
 ################################################################################
 # Analyze CSI x PM2.5 concentration (2019)
-lm_pm25_2019 <- lm(csi_100 ~ pm25_2019, data = sf_csi_cond)
-summary(lm_pm25_2019)
-confint(lm_pm25_2019)
+lm_pm25 <- lm(csi_100 ~ pm25_2019, data = sf_csi_cond)
+summary(lm_pm25)
+confint(lm_pm25)
 
+# Test for normally distributed residuals.
+shapiro.test(lm_pm25$residuals)
+
+# Visualize
+hist(lm_pm25$residuals)
+qqnorm(lm_pm25$residuals)
+qqline(lm_pm25$residuals, col = "orange")
+
+# Plot
 ggplot_csi_pm252019 <-
   ggplot2::ggplot(sf_csi_cond, aes(x = pm25_2019, y = csi_100)) +
   ggplot2::geom_point(alpha = 0.6) +
   ggplot2::geom_smooth(
-    method = "lm", se = TRUE, color = "orange", fill = "lightgrey"
+    method = "lm",
+    se = TRUE,
+    color = "orange",
+    fill = "lightgrey"
   ) +
   ggplot2::labs(
     x = "PM2.5 Concentration (µg/m^3)",
@@ -99,21 +136,45 @@ ggplot_csi_pm252019
 dev.off()
 
 ################################################################################
-# Analyze CSI x temperature.
-# plot(csi_100 ~ temp, data = sf_csi_cond)
-# lm_temp <- lm(csi_100 ~ temp, data = sf_csi_cond)
-# summary(lm_temp)
+# Analyze CSI x cooling degree days.
+lm_cdd <- lm(csi_100 ~ CDD, data = sf_csi_cond)
+summary(lm_cdd)
+confint(lm_cdd)
 
-# ggplot2::ggplot(sf_csi_cond, aes(x = temp, y = csi_100)) +
-#   ggplot2::geom_point(alpha = 0.6) +
-#   ggplot2::geom_smooth(
-#     method = "lm", se = TRUE, color = "red", fill = "lightgrey"
-#   ) +
-#   ggplot2::labs(
-#     x = "Temperature Statistic",
-#     y = "Community Severance Index (CSI) Score"
-#   ) +
-#   ggpubr::theme_pubr()
+# Test for normally distributed residuals.
+shapiro.test(lm_cdd$residuals)
+
+# Visualize
+hist(lm_cdd$residuals)
+qqnorm(lm_cdd$residuals)
+qqline(lm_cdd$residuals, col = "red")
+
+# Plot
+ggplot_csi_cdd <-
+  ggplot2::ggplot(sf_csi_cond, aes(x = CDD, y = csi_100)) +
+  ggplot2::geom_point(alpha = 0.6) +
+  ggplot2::geom_smooth(
+    method = "lm",
+    se = TRUE,
+    color = "red",
+    fill = "lightgrey"
+  ) +
+  ggplot2::labs(
+    x = "Cooling Degree Days (CDD)",
+    y = "Community Severance Index (CSI) Score"
+  ) +
+  ggpubr::theme_pubr()
+ggplot_csi_cdd
+
+chr_csi_cdd <- paste0(
+  "figures/",
+  "ggplot_csi_cdd_",
+  format(Sys.time(), "%m%d_%H%M"),
+  ".png"
+)
+png(chr_csi_cdd)
+ggplot_csi_cdd
+dev.off()
 
 ################################################################################
 # Analyze CSI x % white population (linear regression)
@@ -121,11 +182,23 @@ lm_perc_white <- lm(csi_100 ~ perc_white, data = sf_csi_cond)
 summary(lm_perc_white)
 confint(lm_perc_white)
 
+# Test for normally distributed residuals.
+shapiro.test(lm_perc_white$residuals)
+
+# Visualize
+hist(lm_perc_white$residuals)
+qqnorm(lm_perc_white$residuals)
+qqline(lm_perc_white$residuals, col = "red")
+
+# Plot
 ggplot_csi_white <-
   ggplot2::ggplot(sf_csi_cond, aes(x = perc_white, y = csi_100)) +
   ggplot2::geom_point(alpha = 0.6) +
   ggplot2::geom_smooth(
-    method = "lm", se = TRUE, color = "blue", fill = "lightgrey"
+    method = "lm",
+    se = TRUE,
+    color = "blue",
+    fill = "lightgrey"
   ) +
   ggplot2::labs(
     x = "Non-Hispanic White Population (%)",
@@ -145,16 +218,28 @@ ggplot_csi_white
 dev.off()
 
 ################################################################################
-# Analyze CSI x % black population (linear regression)
+# Analyze CSI x % Black population (linear regression)
 lm_perc_black <- lm(csi_100 ~ perc_black, data = sf_csi_cond)
 summary(lm_perc_black)
 confint(lm_perc_black)
 
+# Test for normally distributed residuals.
+shapiro.test(lm_perc_black$residuals)
+
+# Visualize
+hist(lm_perc_black$residuals)
+qqnorm(lm_perc_black$residuals)
+qqline(lm_perc_black$residuals, col = "blue")
+
+# Plot
 ggplot_csi_black <-
   ggplot2::ggplot(sf_csi_cond, aes(x = perc_black, y = csi_100)) +
   ggplot2::geom_point(alpha = 0.6) +
   ggplot2::geom_smooth(
-    method = "lm", se = TRUE, color = "blue", fill = "lightgrey"
+    method = "lm",
+    se = TRUE,
+    color = "blue",
+    fill = "lightgrey"
   ) +
   ggplot2::labs(
     x = "Non-Hispanic Black Population (%)",
@@ -174,16 +259,28 @@ ggplot_csi_black
 dev.off()
 
 ################################################################################
-# Analyze CSI x % hispanic population (linear regression)
+# Analyze CSI x % Hispanic/Latino population (linear regression)
 lm_perc_hispanic <- lm(csi_100 ~ perc_hispanic, data = sf_csi_cond)
 summary(lm_perc_hispanic)
 confint(lm_perc_hispanic)
 
+# Test for normally distributed residuals.
+shapiro.test(lm_perc_hispanic$residuals)
+
+# Visualize
+hist(lm_perc_hispanic$residuals)
+qqnorm(lm_perc_hispanic$residuals)
+qqline(lm_perc_hispanic$residuals, col = "blue")
+
+# Plot
 ggplot_csi_hispanic <-
   ggplot2::ggplot(sf_csi_cond, aes(x = perc_hispanic, y = csi_100)) +
   ggplot2::geom_point(alpha = 0.6) +
   ggplot2::geom_smooth(
-    method = "lm", se = TRUE, color = "blue", fill = "lightgrey"
+    method = "lm",
+    se = TRUE,
+    color = "blue",
+    fill = "lightgrey"
   ) +
   ggplot2::labs(
     x = "Hispanic Population (%)",

@@ -33,21 +33,46 @@ sf_context <- sf_nh_boundary
 ################################################################################
 # Classify variables.
 chr_varnames <- c(
-  "autom_netw_dens", "autom_inters_dens", "barrier_factor_osm",
-  "barrier_factor_faf5", "motorway_prox", "primary_prox",
-  "secondary_prox", "trunk_prox", "interstate_highway_prox",
-  "freeways_expressways_prox", "other_princ_arter_prox", "tertiary_prox",
-  "residential_prox", "aadt_esri_point", "aadt_fhwa_segm", "co2_emis_per_m2",
-  "pedest_netw_dens", "street_no_autom_inters_dens", "NatWalkInd"
+  "autom_netw_dens",
+  "autom_inters_dens",
+  "barrier_factor_osm",
+  "barrier_factor_faf5",
+  "motorway_prox",
+  "primary_prox",
+  "secondary_prox",
+  "trunk_prox",
+  "interstate_highway_prox",
+  "freeways_expressways_prox",
+  "other_princ_arter_prox",
+  "tertiary_prox",
+  "residential_prox",
+  "aadt_esri_point",
+  "aadt_fhwa_segm",
+  "co2_emis_per_m2",
+  "pedest_netw_dens",
+  "street_no_autom_inters_dens",
+  "NatWalkInd"
 )
 chr_varcat <- c(
-  "Road infrastructure", "Road infrastructure", "Road infrastructure",
-  "Road infrastructure", "Road infrastructure", "Road infrastructure",
-  "Road infrastructure", "Road infrastructure", "Road infrastructure",
-  "Road infrastructure", "Road infrastructure", "Road infrastructure",
-  "Road infrastructure", "Road traffic activity", "Road traffic activity",
-  "Road traffic activity", "Pedestrian infrastructure",
-  "Pedestrian infrastructure", "Pedestrian infrastructure"
+  "Road infrastructure",
+  "Road infrastructure",
+  "Road infrastructure",
+  "Road infrastructure",
+  "Road infrastructure",
+  "Road infrastructure",
+  "Road infrastructure",
+  "Road infrastructure",
+  "Road infrastructure",
+  "Road infrastructure",
+  "Road infrastructure",
+  "Road infrastructure",
+  "Road infrastructure",
+  "Road traffic activity",
+  "Road traffic activity",
+  "Road traffic activity",
+  "Pedestrian infrastructure",
+  "Pedestrian infrastructure",
+  "Pedestrian infrastructure"
 )
 df_var_namecat <- data.frame(
   variable = chr_varnames,
@@ -98,7 +123,10 @@ testthat::expect_length(num_r_opt, 1)
 ################################################################################
 # Run PCP with optimal parameters.
 list_rrmc_opt <- pcpr::rrmc(
-  D = mat_csi_scale, r = num_r_opt, eta = num_eta_opt, LOD = num_lod
+  D = mat_csi_scale,
+  r = num_r_opt,
+  eta = num_eta_opt,
+  LOD = num_lod
 )
 
 ################################################################################
@@ -171,7 +199,7 @@ num_n <- nrow(list_rrmc_opt$L)
 # Run factor analysis.
 list_csi_fa <- num_factors %>%
   purrr::map(
-    ~psych::fa(
+    ~ psych::fa(
       list_rrmc_opt$L,
       nfactors = .,
       n.obs = num_n,
@@ -183,7 +211,7 @@ list_csi_fa %>% purrr::walk(print, digits = 2, sort = TRUE)
 
 ################################################################################
 # Identify best
-num_ebic <- list_csi_fa %>% purrr::map_dbl(~.$EBIC)
+num_ebic <- list_csi_fa %>% purrr::map_dbl(~ .$EBIC)
 num_best_ebic <- which.min(num_ebic)
 
 ################################################################################
@@ -200,7 +228,8 @@ df_loadings <- dplyr::as_tibble(
 colnames(df_loadings)[1] <- "Variable"
 df_loadings <- df_loadings %>%
   dplyr::mutate_at(
-    colnames(df_loadings)[grep("MR", colnames(df_loadings))], as.numeric
+    colnames(df_loadings)[grep("MR", colnames(df_loadings))],
+    as.numeric
   )
 df_loadings$max <- colnames(df_loadings[, -1])[
   max.col(df_loadings[, -1], ties.method = "first")
@@ -215,12 +244,10 @@ df_scores <- dplyr::as_tibble(
 df_scores$max <- colnames(df_scores)[max.col(df_scores, ties.method = "first")]
 
 ################################################################################
-# Calculate weighted index score based on 3 retained components and their
-# proportion of variance explained
+# Calculate CSI with Yeo-Johnson transformation to minimize skew for negative
+# and positive values.
 num_mr_weights <- fa_csi$Vaccounted["Proportion Var", ]
-df_scores$csi <- as.numeric(
-  as.matrix(df_scores[, grep("MR", names(df_scores))]) %*% num_mr_weights
-)
+df_scores$csi <- df_scores$MR1
 df_scores$csi_normal <- normalize(df_scores$csi)
 df_scores$csi_100 <- df_scores$csi_normal * 100
 
@@ -237,10 +264,10 @@ source("R/print_pattern_locs.R")
 chr_fa_plot_path <- file.path("figures", "fa_patterns.png")
 png(chr_fa_plot_path, 1250, 460)
 print_patterns_loc(
-  mat_pats[, grep("MR", colnames(mat_pats)), drop = FALSE],
+  mat_pats[, grep("MR2", colnames(mat_pats)), drop = FALSE],
   colgroups = df_var_namecat[, c("variable", "category")],
   pat_type = "factor",
-  n = ncol(mat_pats),
+  n = 1,
   title = "FA factors",
   size_line = 2,
   size_point = 3.5
@@ -250,14 +277,18 @@ dev.off()
 ################################################################################
 # Merge CSI score with variable data.
 sf_csi_variables <- merge(
-  sf_csi_raw, sf::st_drop_geometry(sf_csi_scale), by = "GEOID20"
+  sf_csi_raw,
+  sf::st_drop_geometry(sf_csi_scale),
+  by = "GEOID20"
 )
 names(sf_csi_variables) <- gsub(
-  ".x", "_raw", gsub(".y", "_scale", names(sf_csi_variables))
+  "\\.x",
+  "_raw",
+  gsub("\\.y", "_scale", names(sf_csi_variables))
 )
 sf_csi_nh <- cbind(
   sf_csi_variables,
-  df_scores[, grep("MR\\d{1}|max", names(df_scores), invert = TRUE)]
+  df_scores
 )
 
 ################################################################################
@@ -270,3 +301,53 @@ write.csv(sf_csi_nh, chr_sf_csi_csv)
 
 chr_sf_csi_github <- file.path(dir_data, "github", "sf_csi_nh.csv")
 write.csv(sf_csi_nh, chr_sf_csi_github)
+
+################################################################################
+# Calculate correlations
+sf_csi_raw$MR2 <- df_scores$MR2
+df_csi_raw_corr <- sf::st_drop_geometry(sf_csi_raw) %>%
+  dplyr::select(-MR2, -GEOID20) %>%
+  dplyr::summarise(
+    dplyr::across(
+      dplyr::everything(),
+      ~ cor(.x, sf_csi_raw$MR2, use = "complete.obs")
+    )
+  ) %>%
+  tidyr::pivot_longer(
+    cols = dplyr::everything(),
+    names_to = "variable",
+    values_to = "correlation"
+  )
+
+# Plot
+ggplot_csi_corr <- ggplot2::ggplot(
+  df_csi_raw_corr,
+  ggplot2::aes(x = variable, y = 1, fill = correlation)
+) +
+  ggplot2::geom_tile(color = "white", height = 0.9) +
+  ggplot2::geom_text(
+    ggplot2::aes(label = round(correlation, 1)),
+    vjust = 0.5,
+    size = 3.5
+  ) +
+  ggplot2::scale_fill_gradient2(
+    low = "blue",
+    mid = "white",
+    high = "red",
+    midpoint = 0,
+    limits = c(-1, 1),
+    name = "Corr"
+  ) +
+  ggplot2::theme_minimal() +
+  ggplot2::theme(
+    axis.text.y = ggplot2::element_blank(),
+    axis.ticks.y = ggplot2::element_blank(),
+    axis.title = ggplot2::element_blank(),
+    axis.text.x = ggplot2::element_text(angle = 45, hjust = 1),
+    panel.grid = ggplot2::element_blank()
+  )
+
+chr_var_corr_path <- file.path("figures", "variable_correlations.png")
+png(chr_var_corr_path, 1250, 460)
+ggplot_csi_corr
+dev.off()

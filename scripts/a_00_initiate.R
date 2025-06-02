@@ -31,7 +31,6 @@ chr_packages <- c(
   "kableExtra",
   "sp",
   "terra",
-  "raster",
   "plotly",
   "exactextractr",
   "tidycensus",
@@ -40,13 +39,16 @@ chr_packages <- c(
   "tidyverse",
   "tigris",
   "daymetr",
-  "ncdf4",
   "readxl",
   "rnaturalearth",
   "geodata",
   "purrr",
   "zoo",
-  "patchwork"
+  "patchwork",
+  "mgcv",
+  "bestNormalize",
+  "scales",
+  "mgcv"
 )
 
 install_if_missing <- function(package) {

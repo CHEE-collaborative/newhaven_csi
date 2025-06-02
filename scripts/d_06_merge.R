@@ -3,7 +3,7 @@
 # demographic conditions data.
 
 ################################################################################
-# Source variables from a_00_initiate.R
+# Source variables from a_00_initiate.
 source(file.path(here::here(), "scripts", "a_00_initiate.R"))
 
 ################################################################################
@@ -11,7 +11,9 @@ source(file.path(here::here(), "scripts", "a_00_initiate.R"))
 chr_sf_csi_path <- file.path(dir_output, "c_01", "sf_csi_polygons.rds")
 testthat::expect_true(file.exists(chr_sf_csi_path))
 sf_csi_polygons <- readRDS(chr_sf_csi_path)
-sf_csi <- sf_csi_polygons[, c("GEOID20", "csi_100")]
+sf_csi <- sf_csi_polygons[,
+  c("GEOID20", "csi", "csi_normal", "csi_100", "MR1", "MR2")
+]
 
 ################################################################################
 # List output files.
@@ -29,11 +31,13 @@ for (c in seq_along(chr_output_files)) {
 ################################################################################
 # Merge CSI data with environmental and demographic conditions.
 sf_csi_cond <- dplyr::left_join(
-  sf_csi, sf::st_drop_geometry(sf_tree), by = "GEOID20"
+  sf_csi,
+  sf::st_drop_geometry(sf_tree),
+  by = "GEOID20"
 ) %>%
   dplyr::left_join(sf::st_drop_geometry(sf_no2_proj), by = "GEOID20") %>%
   dplyr::left_join(sf::st_drop_geometry(sf_pm25_proj), by = "GEOID20") %>%
-  # dplyr::left_join(sf::st_drop_geometry(sf_temp), by = "GEOID20") %>%
+  dplyr::left_join(sf::st_drop_geometry(sf_cdd), by = "GEOID20") %>%
   dplyr::left_join(sf::st_drop_geometry(sf_demographic_nh), by = "GEOID20")
 
 ################################################################################

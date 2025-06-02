@@ -72,3 +72,21 @@ unzip("USER_PATH/Downloads/newhaven_csi_data.zip", exdir = "USER_PATH/newhaven_c
 - c_01/
   - `sf_csi_polygons.rds`: CSI values, raw variables, and scaled variables at the census block group level for New Haven boundary, merged with polygon spatial geometries (`POLYGON`). `sf`
   - `sf_faf5_123_nh.rds`: FAF5 values filtered to primary, secondary, and tertiary roads for New Haven town boundary. `sf`
+
+- d_01/
+  - `sf_tree.rds`: Percentage tree cover for census block groups. `sf`
+
+- d_02/
+  - `sf_no2_proj.rds`: Average NO2 concentration in year 2019 for census block groups. `sf`
+
+- d_03/
+  - `sf_pm25_proj.rds`: Average PM2.5 concentration in year 2019 for census block groups. `sf`
+
+- d_04/
+  - `sf_cdd.rds`: Total Cooling Degree Days in 2019 for census block groups. `sf`
+
+- d_05/
+  - `sf_demographic_nh.rds`: Demographic data for New Haven census block grooups for 2019. `sf`
+
+- d_06/
+  - `sf_csi_cond.rds`: CSI data merged with all environmental and demographic conditions variables. `sf`
