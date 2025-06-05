@@ -84,7 +84,7 @@ ggplot_csi_faf5 <- ggplot2::ggplot() +
     lwd = 1
   ) +
   ggplot2::geom_sf(
-    data = sf_csi_polygons, aes(fill = csi_normal), color = "black"
+    data = sf_csi_polygons, aes(fill = MR1), color = "black"
   ) +
   ggplot2::scale_fill_distiller(
     palette = "Blues", name = "CSI", direction = 1
