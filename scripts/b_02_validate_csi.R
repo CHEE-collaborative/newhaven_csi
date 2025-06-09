@@ -89,9 +89,15 @@ sf_crash <- sf::st_as_sf(
   sf::st_transform(crs = sf::st_crs(sf_csi_polygons))
 
 ################################################################################
+# Pedestrian-involved crashes.
+sf_crash_ped <- sf_crash[sf_crash$Number.Of.Non.Motorist > 0, ]
+
+################################################################################
 # Count number of crashes per census block group.
 list_csi_crash <- sf::st_intersects(sf_csi_polygons, sf_crash)
 sf_csi_polygons$crashes <- lengths(list_csi_crash)
+list_csi_crash_ped <- sf::st_intersects(sf_csi_polygons, sf_crash_ped)
+sf_csi_polygons$crashes_ped <- lengths(list_csi_crash_ped)
 
 ################################################################################
 # Import Area Deprivation Index (ADI) data.
@@ -142,7 +148,7 @@ qqnorm(lm_mr1_crashes$residuals)
 qqline(lm_mr1_crashes$residuals, col = "blue")
 
 # Plot
-ggplot2::ggplot(sf_csi_polygons1, aes(x = crashes, y = MR1)) +
+ggplot2::ggplot(sf_csi_polygons1, aes(x = crashes_ped, y = MR1)) +
   ggplot2::geom_point(alpha = 0.6) +
   ggplot2::geom_smooth(
     method = "lm",
@@ -190,9 +196,12 @@ ggplot2::ggplot(sf_csi_polygons1, aes(x = crashes, y = MR2)) +
 
 ################################################################################
 # Assess relationship between MR1 and crashes (gam).
-plot(MR1_yj ~ crashes, data = sf_csi_polygons1)
+plot(MR1_yj ~ crashes_ped, data = sf_csi_polygons1)
 gam_mr1_crash <- mgcv::gam(
-  MR1_normal ~ s(crashes, bs = "cr", k = 3) + as.numeric(popdens) + ADI_STATE,
+  MR1_normal ~
+    s(crashes_ped, bs = "cr", k = 3) +
+      as.numeric(popdens) +
+      ADI_STATE,
   data = sf_csi_polygons1,
   family = nb()
 )
@@ -207,9 +216,12 @@ qqnorm(gam_mr1_crash$residuals)
 qqline(gam_mr1_crash$residuals, col = "blue")
 
 library(gratia)
-smooth_gam_mr1 <- gratia::smooth_estimates(gam_mr1_crash, smooth = "s(crashes)")
+smooth_gam_mr1 <- gratia::smooth_estimates(
+  gam_mr1_crash,
+  smooth = "s(crashes_ped)"
+)
 
-ggplot2::ggplot(smooth_gam_mr1, aes(x = crashes, y = .estimate)) +
+ggplot2::ggplot(smooth_gam_mr1, aes(x = crashes_ped, y = .estimate)) +
   ggplot2::geom_line(color = "blue", size = 1) +
   ggplot2::geom_ribbon(
     aes(ymin = .estimate - 2 * .se, ymax = .estimate + 2 * .se),
@@ -228,9 +240,12 @@ ggplot2::ggplot(smooth_gam_mr1, aes(x = crashes, y = .estimate)) +
 
 ################################################################################
 # Assess relationship between MR2 and crashes (gam).
-plot(MR2_normal ~ crashes, data = sf_csi_polygons1)
+plot(MR2_normal ~ crashes_ped, data = sf_csi_polygons1)
 gam_mr2_crash <- mgcv::gam(
-  MR2_normal ~ s(crashes, bs = "cr", k = 3) + as.numeric(popdens) + ADI_STATE,
+  MR2_normal ~
+    s(crashes_ped, bs = "cr", k = 3) +
+      as.numeric(popdens) +
+      ADI_STATE,
   data = sf_csi_polygons1,
   family = nb()
 )
@@ -244,9 +259,12 @@ hist(gam_mr2_crash$residuals)
 qqnorm(gam_mr2_crash$residuals)
 qqline(gam_mr2_crash$residuals, col = "blue")
 
-smooth_gam_mr2 <- gratia::smooth_estimates(gam_mr2_crash, smooth = "s(crashes)")
+smooth_gam_mr2 <- gratia::smooth_estimates(
+  gam_mr2_crash,
+  smooth = "s(crashes_ped)"
+)
 
-ggplot2::ggplot(smooth_gam_mr2, aes(x = crashes, y = .estimate)) +
+ggplot2::ggplot(smooth_gam_mr2, aes(x = crashes_ped, y = .estimate)) +
   ggplot2::geom_line(color = "red", size = 1) +
   ggplot2::geom_ribbon(
     aes(ymin = .estimate - 2 * .se, ymax = .estimate + 2 * .se),
@@ -262,19 +280,3 @@ ggplot2::ggplot(smooth_gam_mr2, aes(x = crashes, y = .estimate)) +
     y = "Effect on MR1 (partial)"
   ) +
   ggplot2::theme_minimal()
-
-
-################################################################################
-# Drop census block group with no neighbors.
-sf_csi_cond_nn <- sf_csi_polygons1[
-  grep("090091428004", sf_csi_polygons1$GEOID20, invert = TRUE),
-]
-
-################################################################################
-# GEOID as a multi-level factor.
-sf_csi_cond_nn$GEOID20F <- as.factor(sf_csi_cond_nn$GEOID20)
-
-################################################################################
-# Define nearest neighbors.
-nb_csi_cond <- spdep::poly2nb(sf_csi_cond_nn)
-names(nb_csi_cond) <- levels(sf_csi_cond_nn$GEOID20F)
