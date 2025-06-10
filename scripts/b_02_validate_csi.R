@@ -196,10 +196,9 @@ ggplot2::ggplot(sf_csi_polygons1, aes(x = crashes, y = MR2)) +
 
 ################################################################################
 # Assess relationship between MR1 and crashes (gam).
-plot(MR1_yj ~ crashes_ped, data = sf_csi_polygons1)
 gam_mr1_crash <- mgcv::gam(
-  MR1_normal ~
-    s(crashes_ped, bs = "cr", k = 3) +
+  crashes ~
+    s(MR1_normal, bs = "cr", k = 3) +
       as.numeric(popdens) +
       ADI_STATE,
   data = sf_csi_polygons1,
@@ -218,10 +217,10 @@ qqline(gam_mr1_crash$residuals, col = "blue")
 library(gratia)
 smooth_gam_mr1 <- gratia::smooth_estimates(
   gam_mr1_crash,
-  smooth = "s(crashes_ped)"
+  smooth = "s(MR1_normal)"
 )
 
-ggplot2::ggplot(smooth_gam_mr1, aes(x = crashes_ped, y = .estimate)) +
+ggplot2::ggplot(smooth_gam_mr1, aes(x = MR1_normal, y = .estimate)) +
   ggplot2::geom_line(color = "blue", size = 1) +
   ggplot2::geom_ribbon(
     aes(ymin = .estimate - 2 * .se, ymax = .estimate + 2 * .se),
@@ -229,21 +228,20 @@ ggplot2::ggplot(smooth_gam_mr1, aes(x = crashes_ped, y = .estimate)) +
   ) +
   ggplot2::geom_point(
     data = sf_csi_polygons1,
-    aes(x = crashes, y = MR1_normal),
+    aes(x = MR1_normal, y = crashes),
     alpha = 0.6
   ) +
   ggplot2::labs(
-    x = "Number of Crashes",
-    y = "Effect on MR1 (partial)"
+    x = "Effect on MR1 (partial)",
+    y = "Number of Crashes"
   ) +
   ggplot2::theme_minimal()
 
 ################################################################################
 # Assess relationship between MR2 and crashes (gam).
-plot(MR2_normal ~ crashes_ped, data = sf_csi_polygons1)
 gam_mr2_crash <- mgcv::gam(
-  MR2_normal ~
-    s(crashes_ped, bs = "cr", k = 3) +
+  crashes ~
+    s(MR2_normal, bs = "cr", k = 3) +
       as.numeric(popdens) +
       ADI_STATE,
   data = sf_csi_polygons1,
@@ -261,10 +259,10 @@ qqline(gam_mr2_crash$residuals, col = "blue")
 
 smooth_gam_mr2 <- gratia::smooth_estimates(
   gam_mr2_crash,
-  smooth = "s(crashes_ped)"
+  smooth = "s(MR2_normal)"
 )
 
-ggplot2::ggplot(smooth_gam_mr2, aes(x = crashes_ped, y = .estimate)) +
+ggplot2::ggplot(smooth_gam_mr2, aes(x = MR2_normal, y = .estimate)) +
   ggplot2::geom_line(color = "red", size = 1) +
   ggplot2::geom_ribbon(
     aes(ymin = .estimate - 2 * .se, ymax = .estimate + 2 * .se),
@@ -272,11 +270,11 @@ ggplot2::ggplot(smooth_gam_mr2, aes(x = crashes_ped, y = .estimate)) +
   ) +
   ggplot2::geom_point(
     data = sf_csi_polygons1,
-    aes(x = crashes, y = MR2_normal),
+    aes(x = MR2_normal, y = crashes),
     alpha = 0.6
   ) +
   ggplot2::labs(
-    x = "Number of Crashes",
-    y = "Effect on MR1 (partial)"
+    x = "Effect on MR2 (partial)",
+    y = "Number of Crashes"
   ) +
   ggplot2::theme_minimal()
