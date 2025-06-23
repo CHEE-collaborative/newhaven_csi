@@ -83,7 +83,8 @@ df_var_namecat <- data.frame(
 # Define PCP parameters input.
 int_rank <- 5
 df_rrmc_grid <- data.frame(
-  eta = pcpr::get_pcp_defaults(mat_csi_scale)$eta * 10^seq(-1, 2, 1)
+  # eta = 10^seq(-1, 2, 0.5)
+  eta = 10^seq(1.5, 2.5, 0.05) * round(pcpr::get_pcp_defaults(mat_csi_scale)$eta, 3)
 )
 int_runs <- 25L
 num_perc_test <- 0.15
