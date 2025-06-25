@@ -7,9 +7,9 @@ source(file.path(here::here(), "scripts", "a_00_initiate.R"))
 
 ################################################################################
 # Import CSI data.
-chr_csi_path <- file.path(dir_output, "b_01", "sf_csi_nh.rds")
+chr_csi_path <- file.path(dir_output, "b_03", "sf_csi_pca.rds")
 testthat::expect_true(file.exists(chr_csi_path))
-sf_csi_nh <- readRDS(chr_csi_path)
+sf_csi_pca <- readRDS(chr_csi_path)
 
 ################################################################################
 # Import New Haven boundary.
@@ -44,7 +44,7 @@ sf_sld_variables_proj <- readRDS(chr_sld_variables_path)
 ################################################################################
 # Add population data from Smart location Database.
 sf_csi_nh_pop <- merge(
-  sf_csi_nh,
+  sf_csi_pca,
   sf::st_drop_geometry(sf_sld_variables_proj[, c("GEOID20", "TotPop")]),
   by = "GEOID20"
 )
@@ -84,7 +84,7 @@ ggplot_csi_faf5 <- ggplot2::ggplot() +
     lwd = 1
   ) +
   ggplot2::geom_sf(
-    data = sf_csi_polygons, aes(fill = MR1), color = "black"
+    data = sf_csi_polygons, aes(fill = csi_normal), color = "black"
   ) +
   ggplot2::scale_fill_distiller(
     palette = "Blues", name = "CSI", direction = 1

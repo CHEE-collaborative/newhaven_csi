@@ -83,8 +83,8 @@ df_var_namecat <- data.frame(
 # Define PCP parameters input.
 int_rank <- 5
 df_rrmc_grid <- data.frame(
-  # eta = 10^seq(-1, 2, 0.5)
-  eta = 10^seq(1.5, 2.5, 0.05) * round(pcpr::get_pcp_defaults(mat_csi_scale)$eta, 3)
+  eta = 10^seq(-1, 2, 0.5)
+  # eta = 10^seq(1.5, 2.5, 0.05) * round(pcpr::get_pcp_defaults(mat_csi_scale)$eta, 3)
 )
 int_runs <- 25L
 num_perc_test <- 0.15
@@ -116,9 +116,9 @@ list_rrmc_grid_result$summary_stats %>% dplyr::slice_min(rel_err)
 # Extract best parameters according to minimum relative error.
 df_rrmc_opt <- list_rrmc_grid_result$summary_stats %>%
   dplyr::slice_min(rel_err)
-num_eta_opt <- df_rrmc_opt$eta
+num_eta_opt <- df_rrmc_opt$eta[1] # manually select first due to convergence
 testthat::expect_length(num_eta_opt, 1)
-num_r_opt <- df_rrmc_opt$r
+num_r_opt <- df_rrmc_opt$r[1] # manually select first due to convergence
 testthat::expect_length(num_r_opt, 1)
 
 ################################################################################
@@ -262,7 +262,7 @@ mat_pats <- as.matrix(df_pats)
 ################################################################################
 # Plot loadings.
 source("R/print_pattern_locs.R")
-chr_fa_plot_path <- file.path("figures", "fa_patterns.png")
+chr_fa_plot_path <- file.path("figures", "fa_patterns_MR2.png")
 png(chr_fa_plot_path, 1250, 460)
 print_patterns_loc(
   mat_pats[, grep("MR2", colnames(mat_pats)), drop = FALSE],

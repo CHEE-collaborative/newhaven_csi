@@ -175,27 +175,197 @@ df_csi_scale_crashes <- sf::st_drop_geometry(sf_csi_scale_polygons)
 ################################################################################
 # Supervised PCA.
 library(superpc)
-grep("GEOID|crashes", names(df_csi_scale_crashes))
 
-list_pca_csi <- list(
-  x = t(as.matrix(
+# Sample for training and testing indices.
+int_train <- sample(
+  nrow(df_csi_scale_crashes),
+  size = nrow(df_csi_scale_crashes) * 0.8
+)
+int_test <- setdiff(seq_len(nrow(df_csi_scale_crashes)), int_train)
+
+# Split into training and testing data.
+mat_csi_crashes_train <- t(
+  as.matrix(
     df_csi_scale_crashes[
-      , grep("GEOID20|crashes", names(df_csi_scale_crashes), invert = TRUE)
+      int_train,
+      grep("GEOID20|crashes", names(df_csi_scale_crashes), invert = TRUE)
     ]
-  )),
+  )
+)
+mat_csi_crashes_test <- t(
+  as.matrix(
+    df_csi_scale_crashes[
+      int_test,
+      grep("GEOID20|crashes", names(df_csi_scale_crashes), invert = TRUE)
+    ]
+  )
+)
+
+# Training data.
+list_pca_train <- list(
+  x = mat_csi_crashes_train,
+  y = as.matrix(df_csi_scale_crashes$crashes[int_train]),
+  censoring.status = NULL
+)
+
+# Testing data.
+list_pca_test <- list(
+  x = mat_csi_crashes_test,
+  y = as.matrix(df_csi_scale_crashes$crashes[int_test]),
+  censoring.status = NULL
+)
+
+# Train supervised pca.
+superpc_train <- superpc::superpc.train(
+  data = list_pca_train,
+  type = "regression"
+)
+
+# Cross validation.
+superpc_cv <- superpc::superpc.cv(superpc_train, list_pca_train)
+
+# Plot cross validation curves.
+superpc::superpc.plotcv(superpc_cv)
+
+# Likelihood ratio statistic.
+superpc_lrtest <- superpc::superpc.lrtest.curv(
+  superpc_train,
+  list_pca_train,
+  list_pca_test
+)
+
+# Plot Likelihood ratio statistics.
+superpc::superpc.plot.lrtest(superpc_lrtest)
+
+# Predict.
+superpc_pred <- superpc::superpc.predict(
+  superpc_train,
+  list_pca_train,
+  list_pca_test,
+  threshold = 0.65,
+  n.components = 1,
+  prediction.type = "continuous"
+)
+
+# Fit predictions to outcome variable.
+superpc_fit <- superpc.fit.to.outcome(
+  superpc_train,
+  list_pca_test,
+  superpc_pred$v.pred
+)
+
+# Plot predicted outcomes.
+df_superpc <- data.frame(
+  truth = list_pca_test$y,
+  pred = as.numeric(superpc_pred$v.pred)
+)
+
+# Back transform PC predictions based on slope and intercept.
+df_superpc$pred_crashes <-
+  superpc_fit$coeftable[1, 1] +
+  (superpc_fit$coeftable[2, 1] * superpc_pred$v.pred)
+
+# Plot.
+ggplot2::ggplot(df_superpc, aes(x = truth, y = pred_crashes)) +
+  ggplot2::geom_point(color = "steelblue", size = 2) +
+  ggplot2::geom_smooth(method = "lm", se = TRUE, color = "red") +
+  ggplot2::geom_abline(
+    slope = 1,
+    intercept = 0,
+    linetype = "dashed",
+    color = "gray"
+  ) +
+  ggplot2::labs(
+    x = "Crashes",
+    y = "Predicted Value (PC1 score)"
+  ) +
+  ggplot2::theme_minimal()
+
+
+# Per 1SD increase in CSI.
+superpc_fit$coeftable[2, 1] * sd(superpc_pred$v.pred)
+
+# Full dataset for CSI values.
+mat_csi_crashes <- t(
+  as.matrix(
+    df_csi_scale_crashes[
+      grep("GEOID20|crashes", names(df_csi_scale_crashes), invert = TRUE)
+    ]
+  )
+)
+
+# Training data.
+list_pca_full <- list(
+  x = mat_csi_crashes,
   y = as.matrix(df_csi_scale_crashes$crashes),
   censoring.status = NULL
 )
 
-train_csi <- superpc::superpc.train(data = list_pca_csi, type = "regression")
+# Predict all CSI (PC1) values.
+superpc_csi <- superpc::superpc.predict(
+  superpc_train,
+  list_pca_train,
+  list_pca_full,
+  threshold = 0.65,
+  n.components = 1,
+  prediction.type = "scores"
+)
 
+# Get the feature weights from the trained model.
+mat_feat_weights <- superpc_train$feature.scores
 
-cv_csi <- superpc::superpc.cv(train_csi, list_pca_csi)
-superpc::superpc.plotcv(cv_csi)
+# Identify which features are used at the chosen threshold.
+int_feat_threshold <- which(abs(mat_feat_weights) > 0.65)
+
+# Subset the full feature matrix to just those.
+mat_selected <- list_pca_full$x[int_feat_threshold, ]
+
+# Compute PC1 scores as weighted sum.
+num_csi <- colSums(mat_feat_weights[int_feat_threshold] * mat_selected)
+
+# Add to your spatial object.
+sf_csi_scale_polygons$csi <- as.numeric(num_csi)
+sf_csi_scale_polygons$csi_normal <- normalize(as.numeric(num_csi))
+
+# Change name.
+sf_csi_pca <- sf_csi_scale_polygons
+
+# Save output.
+chr_sf_csi_pca_path <- file.path(dir_output, "b_03", "sf_csi_pca.rds")
+saveRDS(sf_csi_pca, chr_sf_csi_pca_path)
+
+df_csi_pca <- sf::st_drop_geometry(sf_csi_pca)
+write.csv(df_csi_pca, gsub("rds", "csv", chr_sf_csi_pca_path))
 
 ################################################################################
-################################################################################
+# Plot training vs testing census block groups.
+sf_csi_scale_polygons$superpc <- "FILL"
+sf_csi_scale_polygons$superpc[int_train] <- "train"
+sf_csi_scale_polygons$superpc[int_test] <- "test"
 
-
-?rep
-gsub("a", NULL, rep("a", 5))
+ggplot2::ggplot() +
+  ggplot2::geom_sf(
+    data = sf_ct_towns,
+    col = "grey50",
+    fill = NA,
+    lwd = 1
+  ) +
+  ggplot2::geom_sf(
+    data = sf_context,
+    fill = "black",
+    alpha = 0.1,
+    color = "black",
+    lwd = 1
+  ) +
+  ggplot2::geom_sf(
+    data = sf_csi_scale_polygons,
+    aes(fill = superpc),
+    color = "black"
+  ) +
+  ggplot2::geom_sf(data = sf_faf5_123_nh, aes(color = "Roadway"), lwd = 1) +
+  ggplot2::scale_color_manual(values = c("Roadway" = "black"), name = "") +
+  ggplot2::coord_sf(
+    xlim = sf::st_bbox(sf_csi_polygons)[c("xmin", "xmax")],
+    ylim = sf::st_bbox(sf_csi_polygons)[c("ymin", "ymax")]
+  ) +
+  ggplot2::theme_bw()
