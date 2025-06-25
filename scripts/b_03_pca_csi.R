@@ -177,9 +177,10 @@ df_csi_scale_crashes <- sf::st_drop_geometry(sf_csi_scale_polygons)
 library(superpc)
 
 # Sample for training and testing indices.
+set.seed(4)
 int_train <- sample(
   nrow(df_csi_scale_crashes),
-  size = nrow(df_csi_scale_crashes) * 0.8
+  size = nrow(df_csi_scale_crashes) * 0.9
 )
 int_test <- setdiff(seq_len(nrow(df_csi_scale_crashes)), int_train)
 
@@ -242,7 +243,7 @@ superpc_pred <- superpc::superpc.predict(
   superpc_train,
   list_pca_train,
   list_pca_test,
-  threshold = 0.65,
+  threshold = 1.4,
   n.components = 1,
   prediction.type = "continuous"
 )
@@ -306,9 +307,9 @@ superpc_csi <- superpc::superpc.predict(
   superpc_train,
   list_pca_train,
   list_pca_full,
-  threshold = 0.65,
+  threshold = 1.4,
   n.components = 1,
-  prediction.type = "scores"
+  prediction.type = "continuous"
 )
 
 # Get the feature weights from the trained model.
@@ -339,9 +340,9 @@ write.csv(df_csi_pca, gsub("rds", "csv", chr_sf_csi_pca_path))
 
 ################################################################################
 # Plot training vs testing census block groups.
-sf_csi_scale_polygons$superpc <- "FILL"
-sf_csi_scale_polygons$superpc[int_train] <- "train"
-sf_csi_scale_polygons$superpc[int_test] <- "test"
+sf_csi_pca$superpc <- "FILL"
+sf_csi_pca$superpc[int_train] <- "train"
+sf_csi_pca$superpc[int_test] <- "test"
 
 ggplot2::ggplot() +
   ggplot2::geom_sf(
@@ -358,14 +359,14 @@ ggplot2::ggplot() +
     lwd = 1
   ) +
   ggplot2::geom_sf(
-    data = sf_csi_scale_polygons,
+    data = sf_csi_pca,
     aes(fill = superpc),
     color = "black"
   ) +
   ggplot2::geom_sf(data = sf_faf5_123_nh, aes(color = "Roadway"), lwd = 1) +
   ggplot2::scale_color_manual(values = c("Roadway" = "black"), name = "") +
   ggplot2::coord_sf(
-    xlim = sf::st_bbox(sf_csi_polygons)[c("xmin", "xmax")],
-    ylim = sf::st_bbox(sf_csi_polygons)[c("ymin", "ymax")]
+    xlim = sf::st_bbox(sf_csi_pca)[c("xmin", "xmax")],
+    ylim = sf::st_bbox(sf_csi_pca)[c("ymin", "ymax")]
   ) +
   ggplot2::theme_bw()
