@@ -117,17 +117,6 @@ mat_csi_scale %>%
   ggplot2::ggtitle("Raw data matrix Pearson Correlation")
 
 ################################################################################
-################################################################################
-# Unsupervised PCA.
-prcomp_csi <- stats::prcomp(mat_csi_scale)
-attributes(prcomp_csi)
-print(prcomp_csi)
-summary(prcomp_csi)
-factoextra::fviz_screeplot(prcomp_csi, addlabels = TRUE)
-################################################################################
-################################################################################
-
-################################################################################
 # Import Connecticut crash data.
 chr_crash_paths <- list.files(
   file.path(dir_input, "ct_car_crash_data"),
@@ -161,11 +150,17 @@ sf_crash <- sf::st_as_sf(
 sf_crash_ped <- sf_crash[sf_crash$Number.Of.Non.Motorist > 0, ]
 
 ################################################################################
+# Non-interstate crashes.
+sf_crash_local <- sf_crash[sf_crash$Route.Class.Text.Format != "Interstate", ]
+
+################################################################################
 # Count number of crashes per census block group.
 list_csi_crash <- sf::st_intersects(sf_csi_scale_polygons, sf_crash)
 sf_csi_scale_polygons$crashes <- lengths(list_csi_crash)
 list_csi_crash_ped <- sf::st_intersects(sf_csi_scale_polygons, sf_crash_ped)
 sf_csi_scale_polygons$crashes_ped <- lengths(list_csi_crash_ped)
+list_csi_crash_local <- sf::st_intersects(sf_csi_scale_polygons, sf_crash_local)
+sf_csi_scale_polygons$crashes_local <- lengths(list_csi_crash_local)
 
 ################################################################################
 # Convert to data.frame.
@@ -205,14 +200,16 @@ mat_csi_crashes_test <- t(
 # Training data.
 list_pca_train <- list(
   x = mat_csi_crashes_train,
-  y = as.matrix(df_csi_scale_crashes$crashes[int_train]),
+  # y = as.matrix(df_csi_scale_crashes$crashes[int_train]),
+  y = as.matrix(df_csi_scale_crashes$crashes_local[int_train]),
   censoring.status = NULL
 )
 
 # Testing data.
 list_pca_test <- list(
   x = mat_csi_crashes_test,
-  y = as.matrix(df_csi_scale_crashes$crashes[int_test]),
+  # y = as.matrix(df_csi_scale_crashes$crashes[int_test]),
+  y = as.matrix(df_csi_scale_crashes$crashes_local[int_test]),
   censoring.status = NULL
 )
 
@@ -243,7 +240,8 @@ superpc_pred <- superpc::superpc.predict(
   superpc_train,
   list_pca_train,
   list_pca_test,
-  threshold = 1.4,
+  # threshold = 1.4, # all crashes
+  threshold = 1.25, # local crashes
   n.components = 1,
   prediction.type = "continuous"
 )
@@ -266,10 +264,11 @@ df_superpc$pred_crashes <-
   superpc_fit$coeftable[1, 1] +
   (superpc_fit$coeftable[2, 1] * superpc_pred$v.pred)
 
+################################################################################
 # Plot.
 ggplot2::ggplot(df_superpc, aes(x = truth, y = pred_crashes)) +
   ggplot2::geom_point(color = "steelblue", size = 2) +
-  ggplot2::geom_smooth(method = "lm", se = TRUE, color = "red") +
+  ggplot2::geom_smooth(method = "lm", se = TRUE, color = "blue") +
   ggplot2::geom_abline(
     slope = 1,
     intercept = 0,
@@ -286,6 +285,24 @@ ggplot2::ggplot(df_superpc, aes(x = truth, y = pred_crashes)) +
 # Per 1SD increase in CSI.
 superpc_fit$coeftable[2, 1] * sd(superpc_pred$v.pred)
 
+# Plot contributions.
+mat_features <- as.matrix(as.integer(superpc_pred$which.features), ncol = 1)
+rownames(mat_features) <- rownames(superpc_pred$which.features)
+colnames(mat_features) <- "PC1"
+chr_fa_plot_path <- file.path("figures", "fa_patterns_superpc.png")
+png(chr_fa_plot_path, 1250, 460)
+print_patterns_loc(
+  mat_features[, grep("PC1", colnames(mat_features)), drop = FALSE],
+  colgroups = df_var_namecat[, c("variable", "category")],
+  pat_type = "factor",
+  n = 1,
+  title = "FA factors",
+  size_line = 2,
+  size_point = 3.5
+)
+dev.off()
+
+################################################################################
 # Full dataset for CSI values.
 mat_csi_crashes <- t(
   as.matrix(
@@ -298,7 +315,8 @@ mat_csi_crashes <- t(
 # Training data.
 list_pca_full <- list(
   x = mat_csi_crashes,
-  y = as.matrix(df_csi_scale_crashes$crashes),
+  # y = as.matrix(df_csi_scale_crashes$crashes),
+  y = as.matrix(df_csi_scale_crashes$crashes_local),
   censoring.status = NULL
 )
 
@@ -307,7 +325,8 @@ superpc_csi <- superpc::superpc.predict(
   superpc_train,
   list_pca_train,
   list_pca_full,
-  threshold = 1.4,
+  # threshold = 1.4,
+  threshold = 1.25,
   n.components = 1,
   prediction.type = "continuous"
 )

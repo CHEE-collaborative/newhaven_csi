@@ -84,10 +84,10 @@ ggplot_csi_faf5 <- ggplot2::ggplot() +
     lwd = 1
   ) +
   ggplot2::geom_sf(
-    data = sf_csi_polygons, aes(fill = csi_normal), color = "black"
+    data = sf_csi_polygons_ped, aes(fill = csi_normal_ped), color = "black"
   ) +
   ggplot2::scale_fill_distiller(
-    palette = "Blues", name = "CSI", direction = 1
+    palette = "Purples", name = "CSI", direction = 1
   ) +
   ggplot2::geom_sf(data = sf_faf5_123_nh, aes(color = "Roadway"), lwd = 1) +
   ggplot2::scale_color_manual(values = c("Roadway" = "black"), name = "") +
