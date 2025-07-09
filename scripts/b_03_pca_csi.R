@@ -146,21 +146,9 @@ sf_crash <- sf::st_as_sf(
   sf::st_transform(crs = sf::st_crs(sf_csi_scale_polygons))
 
 ################################################################################
-# Pedestrian-involved crashes.
-sf_crash_ped <- sf_crash[sf_crash$Number.Of.Non.Motorist > 0, ]
-
-################################################################################
-# Non-interstate crashes.
-sf_crash_local <- sf_crash[sf_crash$Route.Class.Text.Format != "Interstate", ]
-
-################################################################################
 # Count number of crashes per census block group.
 list_csi_crash <- sf::st_intersects(sf_csi_scale_polygons, sf_crash)
 sf_csi_scale_polygons$crashes <- lengths(list_csi_crash)
-list_csi_crash_ped <- sf::st_intersects(sf_csi_scale_polygons, sf_crash_ped)
-sf_csi_scale_polygons$crashes_ped <- lengths(list_csi_crash_ped)
-list_csi_crash_local <- sf::st_intersects(sf_csi_scale_polygons, sf_crash_local)
-sf_csi_scale_polygons$crashes_local <- lengths(list_csi_crash_local)
 
 ################################################################################
 # Convert to data.frame.
@@ -200,16 +188,14 @@ mat_csi_crashes_test <- t(
 # Training data.
 list_pca_train <- list(
   x = mat_csi_crashes_train,
-  # y = as.matrix(df_csi_scale_crashes$crashes[int_train]),
-  y = as.matrix(df_csi_scale_crashes$crashes_local[int_train]),
+  y = as.matrix(df_csi_scale_crashes$crashes[int_train]),
   censoring.status = NULL
 )
 
 # Testing data.
 list_pca_test <- list(
   x = mat_csi_crashes_test,
-  # y = as.matrix(df_csi_scale_crashes$crashes[int_test]),
-  y = as.matrix(df_csi_scale_crashes$crashes_local[int_test]),
+  y = as.matrix(df_csi_scale_crashes$crashes[int_test]),
   censoring.status = NULL
 )
 
@@ -240,8 +226,7 @@ superpc_pred <- superpc::superpc.predict(
   superpc_train,
   list_pca_train,
   list_pca_test,
-  # threshold = 1.4, # all crashes
-  threshold = 1.25, # local crashes
+  threshold = 1.4, # all crashes
   n.components = 1,
   prediction.type = "continuous"
 )
@@ -285,23 +270,6 @@ ggplot2::ggplot(df_superpc, aes(x = truth, y = pred_crashes)) +
 # Per 1SD increase in CSI.
 superpc_fit$coeftable[2, 1] * sd(superpc_pred$v.pred)
 
-# Plot contributions.
-mat_features <- as.matrix(as.integer(superpc_pred$which.features), ncol = 1)
-rownames(mat_features) <- rownames(superpc_pred$which.features)
-colnames(mat_features) <- "PC1"
-chr_fa_plot_path <- file.path("figures", "fa_patterns_superpc.png")
-png(chr_fa_plot_path, 1250, 460)
-print_patterns_loc(
-  mat_features[, grep("PC1", colnames(mat_features)), drop = FALSE],
-  colgroups = df_var_namecat[, c("variable", "category")],
-  pat_type = "factor",
-  n = 1,
-  title = "FA factors",
-  size_line = 2,
-  size_point = 3.5
-)
-dev.off()
-
 ################################################################################
 # Full dataset for CSI values.
 mat_csi_crashes <- t(
@@ -315,8 +283,7 @@ mat_csi_crashes <- t(
 # Training data.
 list_pca_full <- list(
   x = mat_csi_crashes,
-  # y = as.matrix(df_csi_scale_crashes$crashes),
-  y = as.matrix(df_csi_scale_crashes$crashes_local),
+  y = as.matrix(df_csi_scale_crashes$crashes),
   censoring.status = NULL
 )
 
@@ -325,8 +292,7 @@ superpc_csi <- superpc::superpc.predict(
   superpc_train,
   list_pca_train,
   list_pca_full,
-  # threshold = 1.4,
-  threshold = 1.25,
+  threshold = 1.4,
   n.components = 1,
   prediction.type = "continuous"
 )
@@ -347,15 +313,13 @@ num_csi <- colSums(mat_feat_weights[int_feat_threshold] * mat_selected)
 sf_csi_scale_polygons$csi <- as.numeric(num_csi)
 sf_csi_scale_polygons$csi_normal <- normalize(as.numeric(num_csi))
 
-# Change name.
-sf_csi_pca <- sf_csi_scale_polygons
-
 # Save output.
-chr_sf_csi_pca_path <- file.path(dir_output, "b_03", "sf_csi_pca.rds")
-saveRDS(sf_csi_pca, chr_sf_csi_pca_path)
+chr_sf_csi_pca_path <- file.path(dir_output, "b_03", "sf_csi_polygons.rds")
+saveRDS(sf_csi_scale_polygons, chr_sf_csi_pca_path)
 
-df_csi_pca <- sf::st_drop_geometry(sf_csi_pca)
-write.csv(df_csi_pca, gsub("rds", "csv", chr_sf_csi_pca_path))
+df_csi_scale_polygons <- sf::st_drop_geometry(sf_csi_scale_polygons)
+chr_df_csi_pca_path <- file.path(dir_output, "b_03", "df_csi_polygons.csv")
+write.csv(df_csi_scale_polygons, chr_df_csi_pca_path)
 
 ################################################################################
 # Plot training vs testing census block groups.

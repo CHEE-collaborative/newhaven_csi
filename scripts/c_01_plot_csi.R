@@ -7,9 +7,9 @@ source(file.path(here::here(), "scripts", "a_00_initiate.R"))
 
 ################################################################################
 # Import CSI data.
-chr_csi_path <- file.path(dir_output, "b_03", "sf_csi_pca.rds")
+chr_csi_path <- file.path(dir_output, "b_03", "sf_csi_polygons.rds")
 testthat::expect_true(file.exists(chr_csi_path))
-sf_csi_pca <- readRDS(chr_csi_path)
+sf_csi_polygons <- readRDS(chr_csi_path)
 
 ################################################################################
 # Import New Haven boundary.
@@ -44,7 +44,7 @@ sf_sld_variables_proj <- readRDS(chr_sld_variables_path)
 ################################################################################
 # Add population data from Smart location Database.
 sf_csi_nh_pop <- merge(
-  sf_csi_pca,
+  sf_csi_polygons,
   sf::st_drop_geometry(sf_sld_variables_proj[, c("GEOID20", "TotPop")]),
   by = "GEOID20"
 )
@@ -84,10 +84,10 @@ ggplot_csi_faf5 <- ggplot2::ggplot() +
     lwd = 1
   ) +
   ggplot2::geom_sf(
-    data = sf_csi_polygons_ped, aes(fill = csi_normal_ped), color = "black"
+    data = sf_csi_polygons, aes(fill = csi_normal), color = "black"
   ) +
   ggplot2::scale_fill_distiller(
-    palette = "Purples", name = "CSI", direction = 1
+    palette = "Blues", name = "CSI", direction = 1
   ) +
   ggplot2::geom_sf(data = sf_faf5_123_nh, aes(color = "Roadway"), lwd = 1) +
   ggplot2::scale_color_manual(values = c("Roadway" = "black"), name = "") +
@@ -128,7 +128,7 @@ ggplot_barrier_faf5 <- ggplot2::ggplot() +
   ) +
   ggplot2::geom_sf(
     data = sf_csi_polygons,
-    aes(fill = barrier_factor_faf5_raw),
+    aes(fill = barrier_factor_faf5),
     color = "black"
   ) +
   ggplot2::scale_fill_distiller(

@@ -11,9 +11,7 @@ source(file.path(here::here(), "scripts", "a_00_initiate.R"))
 chr_sf_csi_path <- file.path(dir_output, "c_01", "sf_csi_polygons.rds")
 testthat::expect_true(file.exists(chr_sf_csi_path))
 sf_csi_polygons <- readRDS(chr_sf_csi_path)
-sf_csi <- sf_csi_polygons[,
-  c("GEOID20", "csi", "csi_normal", "csi_100", "MR1", "MR2")
-]
+sf_csi <- sf_csi_polygons[, c("GEOID20", "csi", "csi_normal")]
 
 ################################################################################
 # List output files.
